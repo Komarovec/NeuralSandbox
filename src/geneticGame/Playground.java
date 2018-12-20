@@ -8,12 +8,14 @@ package geneticGame;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.HashSet;
-import java.util.Set;
+import static java.lang.Character.toLowerCase;
+import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -22,33 +24,98 @@ import javax.swing.Timer;
  * @author Denis Kurka
  */
 public class Playground extends JPanel implements ActionListener, KeyListener {
-    private Timer timer;
-    private Car test;
+    private final MainFrame mf;
     
-    private final Set<Character> pressed = new HashSet<Character>();
+    private Timer timer;
+    private ArrayList<Barrier> barriers;
+    private ArrayList<Car> cars;
+    private ArrayList<Car> carsToRemove;
+    
+    private Car controled;
+    
+    private final Dimension screenSize;
+    private double scaleIndexX; //Přepokládá že poměr stran je 16:9
 
     
-    public Playground() {
+    public Playground(MainFrame mf) {
+        this.mf = mf;
+        screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         init();
     }
     
     private void init() {
-        this.setSize(new Dimension(1200, 1000));
+        //Škálovat vše podle FullHD
+        scaleIndexX = screenSize.getWidth()/1920;
+        
+        this.setSize(getScaledValue(1200),getScaledValue(1000));
+        this.setLocation(new Point(0,30));
         this.setBackground(Color.white);
         this.setFocusable(true);
         this.addKeyListener(this);
+        
         timer = new Timer(10,this);
         timer.start();
+        barriers = new ArrayList();
+        cars = new ArrayList();
+        carsToRemove = new ArrayList();
         
-        test = new Car(this);
+        barriers.add(new Barrier(1000, 20, this, new Point(getScaledValue(600),getScaledValue(200)), Math.PI/8));
+        
+        
+        newCar(new Car(this, new Point(getWidth()/8, getHeight()/2)));
+    }
+
+    public Dimension getScreenSize() {
+        return screenSize;
+    }
+    
+    public int getScaledValue(int val) {
+        return (int)Math.round(val*scaleIndexX);
+    }
+    
+    public double getScaledValue(double val) {
+        return val*scaleIndexX;
+    }
+    
+    public double getScaleIndexX() {
+        return scaleIndexX;
+    }
+    
+    public void newCar(Car car) {
+        cars.add(car);
+        controled = car;
     }
     
     @Override
     protected void paintComponent(Graphics gr) {
-        super.paintComponent(gr); //To change body of generated methods, choose Tools | Templates.   
-        test.paint(gr);
+        super.paintComponent(gr); //To change body of generated methods, choose Tools | Templates.  
+        
+        if(!barriers.isEmpty()) {
+            barriers.forEach((item) -> {
+                item.paint(gr);
+            });
+        }
+        
+        if(!cars.isEmpty()) {
+            cars.forEach((Car car) -> {
+                car.paint(gr);
+
+                barriers.forEach((br) -> {
+                    if(car.detectCollision(br.getArea()))
+                        carsToRemove.add(car);
+                });
+            });
+        }
+        else {
+            newCar(new Car(this));
+        }
+        
+        if(!carsToRemove.isEmpty()) {
+            carsToRemove.forEach((car) -> {
+                cars.remove(car);
+            });
+        }
     }
-    
     
     @Override
     public void actionPerformed(ActionEvent ae) {
@@ -61,37 +128,42 @@ public class Playground extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        switch(e.getKeyChar()) {
-            case 'w':
-                test.addForce(false);
-                break;
-            case 's':
-                test.addForce(true);
-                break;
-            case 'a':
-                test.startRotation(true);
-                break;
-            case 'd':
-                test.startRotation(false);
-                break;
+        if(controled != null) {
+            switch(toLowerCase(e.getKeyChar())) {
+                case 'w':
+                    controled.addForce(false);
+                    break;
+                case 's':
+                    controled.addForce(true);
+                    break;
+                case 'a':
+                    controled.startRotation(true);
+                    break;
+                case 'd':
+                    controled.startRotation(false);
+                    break;
+            }
         }
+
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        switch(e.getKeyChar()) {
-            case 'w':
-                test.stopForce();
-                break;
-            case 's':
-                test.stopForce();
-                break;
-            case 'a':
-                test.stopRotation();
-                break;
-            case 'd':
-                test.stopRotation();
-                break;
+        if(controled != null) {
+            switch(toLowerCase(e.getKeyChar())) {
+                case 'w':
+                    controled.stopForce();
+                    break;
+                case 's':
+                    controled.stopForce();
+                    break;
+                case 'a':
+                    controled.stopRotation();
+                    break;
+                case 'd':
+                    controled.stopRotation();
+                    break;
+            }
         }
     }
     

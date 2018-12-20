@@ -5,15 +5,17 @@
             <url>src/geneticGame/Playground.java</url>
             <bookmark id="1">
                 <name/>
-                <line>47</line>
+                <line>90</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/Barrier.java</file>
             <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/MainFrame.java</file>
             <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/Car.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/GameObject.java</file>
             <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/Playground.java</file>
         </group>
     </open-files>

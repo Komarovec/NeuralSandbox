@@ -34,11 +34,14 @@ public class Car {
     private Area area;
     private boolean isAccelerating;
     
-    public Car(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor, int angle) {
+    private int maxSpeed;
+    private double acceleration;
+    
+    public Car(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor, int angle) {    
         this.setPg(pg);
         this.setPos(pos);
-        this.setLength(length);
-        this.setWidth(width);
+        this.setLength(pg.getScaledValue(length));
+        this.setWidth(pg.getScaledValue(width));
         this.setFillColor(fillColor);
         this.setCirColor(cirColor);
         this.setAngle(angle);
@@ -53,6 +56,9 @@ public class Car {
         this.accNeg = false;
         this.speed = 0;
         this.angle = 0;
+        
+        this.acceleration = pg.getScaledValue(0.2);
+        this.maxSpeed = (int)Math.round(pg.getScaledValue(3));
     }
     
     public Car(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor) {
@@ -64,11 +70,11 @@ public class Car {
     }
     
     public Car(Playground pg, Point pos) {
-        this(pg, pos, 50, 20, Color.RED, Color.BLACK, 0);
+        this(pg, pos, pg.getScaledValue(20), pg.getScaledValue(8), Color.RED, Color.BLACK, 0);
     }
     
     public Car(Playground pg) {
-        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 50, 20, Color.RED, Color.BLACK, 0);
+        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), pg.getScaledValue(20), pg.getScaledValue(8), Color.RED, Color.BLACK, 0);
     }
 
     //Getters and Setters
@@ -133,6 +139,10 @@ public class Car {
     }
     // End of Getters and Setters
     
+    public boolean detectCollision(Area colArea) {
+        return (this.area.intersects(colArea.getBounds2D()) && colArea.intersects(this.area.getBounds2D()));
+    }
+    
     public void addForce(boolean isNegative) {
         if(isAccelerating) return;
         isAccelerating = true;
@@ -164,23 +174,20 @@ public class Car {
     
     public void move() {
         //if(speed == 0 && !isAccelerating) return;
-        
-        //Out of bounds
-        if(pos.x > pg.getWidth() || pos.y > pg.getHeight() || pos.x < 0 || pos.y < 0)
-            this.setPos(new Point(pg.getWidth()/2, pg.getHeight()/2));
+      
        
         //Zrychlení reaaly smooooth
-        if(isAccelerating && speed < 5 && speed > -5) {
+        if(isAccelerating && speed < maxSpeed && speed > -maxSpeed) {
             if(accNeg)
-                speed -= 0.1;
+                speed -= acceleration/2;
             else
-                speed += 0.1;
+                speed += acceleration/2;
         }
         else if(speed != 0) {
-            if(speed > 0.2)
-                speed -= 0.2;
-            else if(speed < -0.2)
-                speed += 0.2;
+            if(speed > acceleration)
+                speed -= acceleration;
+            else if(speed < -acceleration)
+                speed += acceleration;
             else
                 speed = 0;
         }
@@ -189,6 +196,17 @@ public class Car {
         //Rozložení sil podle sinovy a cosinovy věty
         double spx = speed*cos(angle);
         double spy = speed*sin(angle);
+        
+        //Out of bounds
+        if(pos.x > pg.getWidth())
+            spx = -1;
+        else if(pos.x < 0)
+            spx = 1;
+        
+        if(pos.y+width/2 > pg.getHeight())
+            spy = -1;
+        else if(pos.y < 0)
+            spy = 1;
         
         
         /*   --- Pohyb menší než 1 pixel ---
@@ -223,7 +241,7 @@ public class Car {
             forceToAdd[1]++;
         }
 
-        System.out.println("forceToAdd["+forceToAdd[0]+", "+forceToAdd[1]+"] Speed: "+speed);
+        //System.out.println("forceToAdd["+forceToAdd[0]+", "+forceToAdd[1]+"] Speed: "+speed);
         
         Point newPos = new Point(this.getPos().x+(int)spx,this.getPos().y+(int)spy);
         this.setPos(newPos);
