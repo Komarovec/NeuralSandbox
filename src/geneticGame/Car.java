@@ -22,6 +22,8 @@ import static java.lang.Math.sin;
 public class Car {
     private Playground pg;
     
+    
+    //Car vars
     private int length, width;
     private Point pos;
     private Color fillColor, cirColor;
@@ -33,6 +35,9 @@ public class Car {
     private double[] forceToAdd;
     private Area area;
     private boolean isAccelerating;
+    
+    
+    
     
     private int maxSpeed;
     private double acceleration;
@@ -70,7 +75,7 @@ public class Car {
     }
     
     public Car(Playground pg, Point pos) {
-        this(pg, pos, pg.getScaledValue(20), pg.getScaledValue(8), Color.RED, Color.BLACK, 0);
+        this(pg, pos, 20, 8, Color.RED, Color.BLACK, 0);
     }
     
     public Car(Playground pg) {
@@ -137,32 +142,40 @@ public class Car {
     public Area getArea() {
         return area;
     }
+    
+    
     // End of Getters and Setters
     
+    //Zjištije kolizi s dannou Areou
     public boolean detectCollision(Area colArea) {
         return (this.area.intersects(colArea.getBounds2D()) && colArea.intersects(this.area.getBounds2D()));
     }
     
+    //Přidá sílu k rozložení do os a následnemu zrychlení
     public void addForce(boolean isNegative) {
         if(isAccelerating) return;
         isAccelerating = true;
         accNeg = isNegative;
     }
     
+    //Zastaví zrychlení
     public void stopForce() {
         isAccelerating = false;
     }
     
+    //Povoli rotaci
     public void startRotation(boolean isNegative) {
         if(rotating) return;
         rotating = true;
         rotNeg = isNegative;
     }
     
+    //Zastaví rotaci
     public void stopRotation() {
         rotating = false;
     }
     
+    //Postupne otáčení
     public void rotate() {
         if(rotating) {
             if(rotNeg)
@@ -249,15 +262,16 @@ public class Car {
     
     public void paint(Graphics gr) {
         Graphics2D g2d = (Graphics2D) gr;
-        g2d.setColor(fillColor);
+        
+        //Car
         AffineTransform at = AffineTransform.getRotateInstance(this.angle, pos.x, pos.y);
         area = new Area(at.createTransformedShape(new Rectangle2D.Double(pos.x - length/2, pos.y - width/2, length, width)));
-        //area = new Area(new Rectangle2D.Double(pos.x - length/2, pos.y - width/2, length, width));
-        g2d.fill(area);
         
+        g2d.setColor(fillColor);
+        g2d.fill(area);
         g2d.setColor(cirColor);
         g2d.draw(area);
-        
+  
         this.move();
         this.rotate();
     }

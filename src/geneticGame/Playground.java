@@ -14,6 +14,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import static java.lang.Character.toLowerCase;
 import java.util.ArrayList;
 import javax.swing.JPanel;
@@ -23,19 +26,28 @@ import javax.swing.Timer;
  *
  * @author Denis Kurka
  */
-public class Playground extends JPanel implements ActionListener, KeyListener {
+public class Playground extends JPanel implements ActionListener, KeyListener, MouseMotionListener, MouseListener {
     private final MainFrame mf;
     
     private Timer timer;
     private ArrayList<Barrier> barriers;
-    private ArrayList<Car> cars;
-    private ArrayList<Car> carsToRemove;
+    private ArrayList<CarAI> cars;
+    private ArrayList<CarAI> carsToRemove;
     
     private Car controled;
+    private Spawn spawn;
+    private Finish finish;
     
     private final Dimension screenSize;
     private double scaleIndexX; //Přepokládá že poměr stran je 16:9
-
+    
+    private Point mousePos;
+    
+    private Point newBar;
+    private Barrier tempBarrier;
+    
+    private int stater; //0 - Wait; 1 - Create Mode; 2 - Delete Mode
+    
     
     public Playground(MainFrame mf) {
         this.mf = mf;
@@ -46,12 +58,14 @@ public class Playground extends JPanel implements ActionListener, KeyListener {
     private void init() {
         //Škálovat vše podle FullHD
         scaleIndexX = screenSize.getWidth()/1920;
-        
-        this.setSize(getScaledValue(1200),getScaledValue(1000));
+        this.setSize(getScaledValue(1100),getScaledValue(800));
         this.setLocation(new Point(0,30));
         this.setBackground(Color.white);
         this.setFocusable(true);
+        
         this.addKeyListener(this);
+        this.addMouseMotionListener(this);
+        this.addMouseListener(this);
         
         timer = new Timer(10,this);
         timer.start();
@@ -59,12 +73,17 @@ public class Playground extends JPanel implements ActionListener, KeyListener {
         cars = new ArrayList();
         carsToRemove = new ArrayList();
         
-        barriers.add(new Barrier(1000, 20, this, new Point(getScaledValue(600),getScaledValue(200)), Math.PI/8));
-        
-        
-        newCar(new Car(this, new Point(getWidth()/8, getHeight()/2)));
-    }
+        spawn = new Spawn(this, new Point(getScaledValue(50),getScaledValue(50)));
+        finish = new Finish(this, new Point(this.getWidth() - getScaledValue(150), this.getHeight() - getScaledValue(150)));
 
+        newBar = new Point(-1,-1);
+        
+        stater = 0;
+        
+        newCar(new CarAI(this, spawn.getSpawnpoint()));
+    }
+    
+    //Funkce zajištující škálování
     public Dimension getScreenSize() {
         return screenSize;
     }
@@ -81,33 +100,108 @@ public class Playground extends JPanel implements ActionListener, KeyListener {
         return scaleIndexX;
     }
     
-    public void newCar(Car car) {
+    //Colizní funkce
+    public void inBarrier(CarAI car) {
+        carsToRemove.add(car);
+    }
+    
+    public void inFinish(CarAI car) {
+        carsToRemove.add(car);
+    }
+    
+    //Zajištuje korektní přidání do pole individuálu
+    public void newCar(CarAI car) {
         cars.add(car);
         controled = car;
     }
     
+    public boolean deleteBarrierFromPoint(Point a) {
+        if(barriers.isEmpty())
+            return false;
+        
+        for(Barrier item : barriers) {
+            if(item.getArea().contains(a)) {
+                barriers.remove(item);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public Barrier createBarrierFromPoints(Point a, Point b) {
+        //Vypočet delky a sirky bariery podle dvou bodu
+        int length = Math.abs(a.x - b.x);
+        int width = Math.abs(a.y - b.y);
+        Point s = new Point((a.x+b.x)/2,(a.y+b.y)/2);
+        
+        //Vytvořeni bariery + Vyruseni skalovani --> presne souradnice
+        Barrier newBarrier = new Barrier((int) (length/scaleIndexX), (int) (width/scaleIndexX), this, s, 0);
+        return newBarrier;
+    }
+    
+    //Zapne mod likvidaci barier
+    public void deleteBarrier() {
+        if(stater == 2) return;
+        stater = 2;
+    }
+     
+    //Zapne mod tvoření barier
+    public void createBarrier() {
+        if(stater == 1) return;
+        stater = 1;
+    }
+     
     @Override
     protected void paintComponent(Graphics gr) {
         super.paintComponent(gr); //To change body of generated methods, choose Tools | Templates.  
         
+        //Vykresli spawn a finish
+        spawn.paint(gr);
+        finish.paint(gr);
+        
+        //Vykresli bariery
         if(!barriers.isEmpty()) {
             barriers.forEach((item) -> {
                 item.paint(gr);
             });
         }
         
+        if(tempBarrier != null) {
+            tempBarrier.paint(gr);
+        }
+        
+        //Iteruj pro všechny individualy
         if(!cars.isEmpty()) {
-            cars.forEach((Car car) -> {
+            cars.forEach((CarAI car) -> {
                 car.paint(gr);
-
+                
+                //Defaultni barva senzoru
+                car.getS1().setFillColor(Color.CYAN);
+                car.getS2().setFillColor(Color.CYAN);
+                //Nabourání do bariery
                 barriers.forEach((br) -> {
+                    //Sepnuti senzorů
+                    if(car.getS1().detectCollision(br.getArea()))
+                        car.getS1().setFillColor(Color.RED);
+                    
+                    if(car.getS2().detectCollision(br.getArea()))
+                        car.getS2().setFillColor(Color.RED);
+     
+                    
+                    //Kolize s autem
                     if(car.detectCollision(br.getArea()))
-                        carsToRemove.add(car);
+                        inBarrier(car);
                 });
+                
+                //Najetí do cíle
+                if(car.detectCollision(finish.getArea()))
+                    inFinish(car);
+                
             });
         }
         else {
-            newCar(new Car(this));
+            //Žadní individuálové ve hře
+            newCar(new CarAI(this, new Point(spawn.getSpawnpoint())));
         }
         
         if(!carsToRemove.isEmpty()) {
@@ -122,6 +216,8 @@ public class Playground extends JPanel implements ActionListener, KeyListener {
         this.repaint();
     }
 
+    
+    //Manuální ovládání
     @Override
     public void keyTyped(KeyEvent e) {
     }
@@ -166,5 +262,62 @@ public class Playground extends JPanel implements ActionListener, KeyListener {
             }
         }
     }
-    
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        //Posuvná bariera
+        if(stater == 1 && newBar.x != -1) {
+            tempBarrier = createBarrierFromPoints(newBar, e.getPoint());
+            System.out.println("Creating new barrier ");
+        }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        mousePos = e.getPoint();
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        //Vytváření bariery
+        if(stater == 1)
+            newBar = e.getPoint();
+        
+        //Mazaní bariery
+        else if(stater == 2)
+            deleteBarrierFromPoint(e.getPoint());
+
+        System.out.println("Pressed: "+newBar);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if(stater == 1) {
+            //Vytvoř barieru na pevno
+            barriers.add(tempBarrier);
+            tempBarrier = null;
+            
+            //Reset
+            newBar = new Point(-1,-1);
+            stater = 0;
+        }
+        else if(stater == 2) {
+            //Reset
+            stater = 0;
+        }
+        
+        System.out.println("Released");
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }  
 }
