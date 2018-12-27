@@ -36,7 +36,6 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     
     private Car controled;
     private Spawn spawn;
-    private Finish finish;
     
     private final Dimension screenSize;
     private double scaleIndexX; //Přepokládá že poměr stran je 16:9
@@ -74,13 +73,20 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         carsToRemove = new ArrayList();
         
         spawn = new Spawn(this, new Point(getScaledValue(50),getScaledValue(50)));
-        finish = new Finish(this, new Point(this.getWidth() - getScaledValue(150), this.getHeight() - getScaledValue(150)));
 
         newBar = new Point(-1,-1);
         
         stater = 0;
         
         newCar(new CarAI(this, spawn.getSpawnpoint()));
+    }
+
+    public ArrayList<Barrier> getBarriers() {
+        return barriers;
+    }
+
+    public void setBarriers(ArrayList<Barrier> barriers) {
+        this.barriers = barriers;
     }
     
     //Funkce zajištující škálování
@@ -96,13 +102,16 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         return val*scaleIndexX;
     }
     
-    public double getScaleIndexX() {
-        return scaleIndexX;
+    public int getTrueValue(int val) {
+        return (int)Math.round(val/scaleIndexX);
     }
     
-    //Colizní funkce
-    public void inBarrier(CarAI car) {
-        carsToRemove.add(car);
+    public double getTrueValue(double val) {
+        return val/scaleIndexX;
+    }
+    
+    public double getScaleIndexX() {
+        return scaleIndexX;
     }
     
     public void inFinish(CarAI car) {
@@ -128,17 +137,6 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         return false;
     }
     
-    public Barrier createBarrierFromPoints(Point a, Point b) {
-        //Vypočet delky a sirky bariery podle dvou bodu
-        int length = Math.abs(a.x - b.x);
-        int width = Math.abs(a.y - b.y);
-        Point s = new Point((a.x+b.x)/2,(a.y+b.y)/2);
-        
-        //Vytvořeni bariery + Vyruseni skalovani --> presne souradnice
-        Barrier newBarrier = new Barrier((int) (length/scaleIndexX), (int) (width/scaleIndexX), this, s, 0);
-        return newBarrier;
-    }
-    
     //Zapne mod likvidaci barier
     public void deleteBarrier() {
         if(stater == 2) return;
@@ -157,7 +155,6 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         
         //Vykresli spawn a finish
         spawn.paint(gr);
-        finish.paint(gr);
         
         //Vykresli bariery
         if(!barriers.isEmpty()) {
@@ -175,33 +172,31 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
             cars.forEach((CarAI car) -> {
                 car.paint(gr);
                 
-                //Defaultni barva senzoru
+                /*Defaultni barva senzoru
                 car.getS1().setFillColor(Color.CYAN);
                 car.getS2().setFillColor(Color.CYAN);
+                */
+                
                 //Nabourání do bariery
                 barriers.forEach((br) -> {
+                    //Kolize s autem
+                    if(car.detectCollision(br.getArea()))
+                        carsToRemove.add(car);
+                    
+                    /*
                     //Sepnuti senzorů
                     if(car.getS1().detectCollision(br.getArea()))
                         car.getS1().setFillColor(Color.RED);
                     
                     if(car.getS2().detectCollision(br.getArea()))
                         car.getS2().setFillColor(Color.RED);
-     
-                    
-                    //Kolize s autem
-                    if(car.detectCollision(br.getArea()))
-                        inBarrier(car);
-                });
-                
-                //Najetí do cíle
-                if(car.detectCollision(finish.getArea()))
-                    inFinish(car);
-                
+                    */
+                });         
             });
         }
         else {
             //Žadní individuálové ve hře
-            newCar(new CarAI(this, new Point(spawn.getSpawnpoint())));
+            newCar(new CarAI(this, spawn.getSpawnpoint()));
         }
         
         if(!carsToRemove.isEmpty()) {
@@ -267,7 +262,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     public void mouseDragged(MouseEvent e) {
         //Posuvná bariera
         if(stater == 1 && newBar.x != -1) {
-            tempBarrier = createBarrierFromPoints(newBar, e.getPoint());
+            tempBarrier = new Barrier(this ,newBar, e.getPoint(), 0);
             System.out.println("Creating new barrier ");
         }
     }

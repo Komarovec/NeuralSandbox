@@ -20,27 +20,27 @@ import static java.lang.Math.sin;
  * @author Denis Kurka
  */
 public class Car {
-    private Playground pg;
+    protected Playground pg;
     
     
     //Car vars
-    private int length, width;
-    private Point pos;
-    private Color fillColor, cirColor;
-    private double speed;
-    private boolean accNeg;
-    private double angle;
-    private boolean rotating;
-    private boolean rotNeg;
-    private double[] forceToAdd;
-    private Area area;
-    private boolean isAccelerating;
+    protected int length, width;
+    protected Point pos;
+    protected Color fillColor, cirColor;
+    protected double speed;
+    protected boolean accNeg;
+    protected double angle;
+    protected boolean rotating;
+    protected boolean rotNeg;
+    protected double[] forceToAdd;
+    protected Area area;
+    protected boolean isAccelerating;
     
     
     
     
-    private int maxSpeed;
-    private double acceleration;
+    protected int maxSpeed;
+    protected double acceleration;
     
     public Car(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor, int angle) {    
         this.setPg(pg);
@@ -148,7 +148,7 @@ public class Car {
     
     //Zjištije kolizi s dannou Areou
     public boolean detectCollision(Area colArea) {
-        return (this.area.intersects(colArea.getBounds2D()) && colArea.intersects(this.area.getBounds2D()));
+        return (area.getBounds2D().intersects(colArea.getBounds2D()));
     }
     
     //Přidá sílu k rozložení do os a následnemu zrychlení
@@ -262,7 +262,17 @@ public class Car {
     
     public void paint(Graphics gr) {
         Graphics2D g2d = (Graphics2D) gr;
+        /*
+                AffineTransform2D at = AffineTransform2D.createRotation(pos.x, pos.y, this.angle);
+        Rectangle2D cartangle = new Rectangle2D(pos.x - length/2, pos.y - width/2, length, width);
+        SimplePolygon2D carToDraw = cartangle.transform(at);
         
+        g2d.setColor(fillColor);
+        carToDraw.fill(g2d);
+        g2d.setColor(cirColor);
+        carToDraw.draw(g2d);
+         */
+
         //Car
         AffineTransform at = AffineTransform.getRotateInstance(this.angle, pos.x, pos.y);
         area = new Area(at.createTransformedShape(new Rectangle2D.Double(pos.x - length/2, pos.y - width/2, length, width)));

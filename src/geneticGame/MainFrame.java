@@ -5,7 +5,22 @@
  */
 package geneticGame;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import java.awt.Dimension;
+import java.awt.List;
+import java.awt.Point;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 
 /**
  *
@@ -42,6 +57,8 @@ public class MainFrame extends javax.swing.JFrame {
         deleteButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
+        saveItem = new javax.swing.JMenuItem();
+        loadItem = new javax.swing.JMenuItem();
         editMenu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -72,6 +89,23 @@ public class MainFrame extends javax.swing.JFrame {
         jToolBar1.add(deleteButton);
 
         fileMenu.setText("File");
+
+        saveItem.setText("Save Level");
+        saveItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(saveItem);
+
+        loadItem.setText("Load Level");
+        loadItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(loadItem);
+
         jMenuBar1.add(fileMenu);
 
         editMenu.setText("Edit");
@@ -102,6 +136,14 @@ public class MainFrame extends javax.swing.JFrame {
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         pg.deleteBarrier();
     }//GEN-LAST:event_deleteButtonActionPerformed
+
+    private void saveItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveItemActionPerformed
+        saveLevel();
+    }//GEN-LAST:event_saveItemActionPerformed
+
+    private void loadItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadItemActionPerformed
+        loadLevel();
+    }//GEN-LAST:event_loadItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -138,7 +180,49 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
     }
-
+    
+    static String readFile(String path, Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
+    }
+    
+    public boolean saveLevel() {
+        XStream xstream = new XStream(new DomDriver()); 
+        ArrayList<BarrierSkeleton> skelBars = new ArrayList();
+        for(Barrier b : pg.getBarriers()) {
+            skelBars.add(b.getSkeleton());
+        }
+        String xml = xstream.toXML(skelBars);
+        
+        try (PrintWriter out = new PrintWriter("level.xml")) {
+            out.println(xml);
+            return true;
+        }
+        catch(Exception e) {
+            System.out.println(e);
+            return false;
+        }
+    }
+    
+    public boolean loadLevel() {
+        XStream xstream = new XStream(new DomDriver()); 
+        try {
+            String xml = readFile("level.xml", Charset.defaultCharset());
+            ArrayList<BarrierSkeleton> skelBars = (ArrayList<BarrierSkeleton>)xstream.fromXML(xml);
+            
+            ArrayList<Barrier> bars = new ArrayList();
+            for(BarrierSkeleton bs : skelBars) {
+                bars.add(new Barrier(bs.getLenght(), bs.getWidth(), pg, bs.getS(), bs.getAngle()));
+            }
+            
+            pg.setBarriers(bars);
+            return true;
+        }
+        catch(Exception e) {
+            return false;
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton createBarrierButton;
     private javax.swing.JButton deleteButton;
@@ -146,5 +230,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JMenuItem loadItem;
+    private javax.swing.JMenuItem saveItem;
     // End of variables declaration//GEN-END:variables
 }

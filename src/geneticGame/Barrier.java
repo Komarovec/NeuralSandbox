@@ -37,9 +37,27 @@ public class Barrier extends GameObject {
     public Barrier(int length, int width, Playground pg, Point pos) {
         this(length, width, pg, pos, Color.GRAY, Color.BLACK, 0);
     }   
-        
+    
+    public Barrier(Barrier b) {
+        this(b.getLength(),b.getWidth(),b.getPg(),b.getPos(),b.getFillColor(),b.getCirColor(),b.getAngle());
+    }
+    
+    public Barrier(Playground pg,Point a, Point b, double angle) {
+        this(
+             pg.getTrueValue(Math.abs(a.x - b.x)),
+             pg.getTrueValue(Math.abs(a.y - b.y)), 
+             pg, new Point((a.x+b.x)/2,(a.y+b.y)/2), 
+             Color.GRAY, 
+             Color.BLACK, 
+             angle
+        );        
+    }
     
     //Getters and Setters
+    public BarrierSkeleton getSkeleton() {
+        return new BarrierSkeleton(this.pos, pg.getTrueValue(this.length), pg.getTrueValue(this.width),this.angle);
+    }
+    
     public int getLength() {
         return length;
     }
