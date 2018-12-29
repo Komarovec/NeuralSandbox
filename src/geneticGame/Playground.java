@@ -222,10 +222,10 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         if(controled != null) {
             switch(toLowerCase(e.getKeyChar())) {
                 case 'w':
-                    controled.addForce(false);
+                    controled.setForce(1);
                     break;
                 case 's':
-                    controled.addForce(true);
+                    controled.setForce(-1);
                     break;
                 case 'a':
                     controled.startRotation(true);

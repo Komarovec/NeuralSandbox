@@ -36,8 +36,9 @@ public class Car {
     protected Area area;
     protected boolean isAccelerating;
     
-    
-    
+    protected double shearFriction;
+    protected double accelConstant;
+    protected double angleConstant;
     
     protected int maxSpeed;
     protected double acceleration;
@@ -62,7 +63,11 @@ public class Car {
         this.speed = 0;
         this.angle = 0;
         
-        this.acceleration = pg.getScaledValue(0.2);
+        this.shearFriction = pg.getScaledValue(0.05);
+        this.accelConstant = pg.getScaledValue(0.2); // --> MAX 1/5 --> 0.2 Experimentálně určeno
+        this.angleConstant = 0.08; //cca Math.PI/40
+        
+        this.acceleration = 0;
         this.maxSpeed = (int)Math.round(pg.getScaledValue(3));
     }
     
@@ -135,32 +140,34 @@ public class Car {
         return angle;
     }
 
-    public final void setAngle(int angle) {
+    public final void setAngle(double angle) {
         this.angle = angle;
     }
+
+    
 
     public Area getArea() {
         return area;
     }
-    
-    
     // End of Getters and Setters
+    
     
     //Zjištije kolizi s dannou Areou
     public boolean detectCollision(Area colArea) {
         return (area.getBounds2D().intersects(colArea.getBounds2D()));
     }
     
-    //Přidá sílu k rozložení do os a následnemu zrychlení
-    public void addForce(boolean isNegative) {
-        if(isAccelerating) return;
-        isAccelerating = true;
-        accNeg = isNegative;
+    
+    // --- Ovládání binární {0,1} ---
+    //Určuje sílu k zrychlení
+    public void setForce(boolean isNegative) {
+        acceleration = (isNegative) ? -accelConstant : accelConstant;
     }
+    
     
     //Zastaví zrychlení
     public void stopForce() {
-        isAccelerating = false;
+        acceleration = 0;
     }
     
     //Povoli rotaci
@@ -175,35 +182,48 @@ public class Car {
         rotating = false;
     }
     
-    //Postupne otáčení
-    public void rotate() {
+    // --- Ovládání analog <-1; 1> ---
+    //Pouze --> <-1; 1>
+    public void setForce(double accel) {
+        if(Math.abs(accel) > 1) return;
+        acceleration = pg.getScaledValue(accel/5);
+    }
+    
+    //Ovladací funkce - rotace --> Pouze <0; 1>
+    public void setRotation(double angle) {
+        if(Math.abs(angle) > 1) return;
+        
+        angle = (angle/6.25)-0.08; //Přeškálování  z <0;1> do Úhlů <-0.08;0.08>
+        
+        this.angle += angle;
+    }
+    
+    
+    
+    //Postupne otáčení pouze v případě klávesnice
+    public void rotateManual() {
         if(rotating) {
-            if(rotNeg)
-                angle -= Math.PI/40;
-            else 
-                angle += Math.PI/40;
+            angle += (rotNeg) ? -angleConstant : angleConstant;
         }
     }
+    
     
     public void move() {
         //if(speed == 0 && !isAccelerating) return;
       
        
         //Zrychlení reaaly smooooth
-        if(isAccelerating && speed < maxSpeed && speed > -maxSpeed) {
-            if(accNeg)
-                speed -= acceleration/2;
-            else
-                speed += acceleration/2;
+        if(Math.abs(speed) < maxSpeed) {
+            speed += acceleration;
         }
-        else if(speed != 0) {
-            if(speed > acceleration)
-                speed -= acceleration;
-            else if(speed < -acceleration)
-                speed += acceleration;
-            else
+
+        if(speed != 0) {
+            if(Math.abs(speed) < shearFriction)
                 speed = 0;
+            else
+                speed += (speed > 0) ? -shearFriction : shearFriction;
         }
+       
         
         
         //Rozložení sil podle sinovy a cosinovy věty
@@ -283,6 +303,6 @@ public class Car {
         g2d.draw(area);
   
         this.move();
-        this.rotate();
+        this.rotateManual();
     }
 }

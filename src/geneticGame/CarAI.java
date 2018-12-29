@@ -5,17 +5,21 @@
  */
 package geneticGame;
 
+import geneticGame.neuralNetwork.NeuralNetwork;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Area;
+import java.util.ArrayList;
 
 /**
  *
  * @author Denis Kurka
  */
 public class CarAI extends Car {
+    private NeuralNetwork brain;
+    
     private Sensor sLeft, sRight, sMid;
     private int sLenght;
     private boolean showSensors;
@@ -29,6 +33,8 @@ public class CarAI extends Car {
         sMid = new Sensor(this, sLenght, 1, 5, Color.CYAN, Color.BLACK, 0);
         
         showSensors = true;
+        
+        brain = new NeuralNetwork(this);
     }
     
     public CarAI(Playground pg, Point pos) {
@@ -49,9 +55,23 @@ public class CarAI extends Car {
 
     public Sensor getsMid() {
         return sMid;
+    }   
+    
+    public void applyBrainOutput(ArrayList<Double> output) {
+        setForce(output.get(0));
+        setRotation(output.get(1));
     }
-   
-
+    
+    public ArrayList<Double> measureDistance() {
+        ArrayList<Double> inputs = new ArrayList();
+        
+        inputs.add(getsLeft().getDistanceToBarrier());
+        inputs.add(getsMid().getDistanceToBarrier());
+        inputs.add(getsRight().getDistanceToBarrier());
+        
+        return inputs;
+    }
+    
     public boolean isShowSensors() {
         return showSensors;
     }
@@ -76,6 +96,7 @@ public class CarAI extends Car {
         sRight.paint(gr, showSensors);
         sMid.paint(gr, showSensors);
         
-        System.out.println("Dist: "+sLeft.getDistanceToBarrier());
+        brain.think(measureDistance());
+        //System.out.println("Dist: "+sLeft.getDistanceToBarrier());
     }
 }
