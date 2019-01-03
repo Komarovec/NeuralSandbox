@@ -5,9 +5,6 @@
  */
 package geneticGame.neuralNetwork;
 
-import geneticGame.Playground;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -77,12 +74,7 @@ public class Neuron {
         
         Random rand = new Random();
         for (int i = 0; i < consCount; i++) {
-            weights.add(rand.nextDouble());
+            weights.add((rand.nextDouble()*2)-1);
         }
-    }
-     
-    public void paint(Graphics gr, Playground pg) {
-        Graphics2D g2d = (Graphics2D)gr;
-        
     }
 }

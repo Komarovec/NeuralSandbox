@@ -216,6 +216,8 @@ public class Car {
         if(Math.abs(speed) < maxSpeed) {
             speed += acceleration;
         }
+        
+
 
         if(speed != 0) {
             if(Math.abs(speed) < shearFriction)
@@ -282,16 +284,6 @@ public class Car {
     
     public void paint(Graphics gr) {
         Graphics2D g2d = (Graphics2D) gr;
-        /*
-                AffineTransform2D at = AffineTransform2D.createRotation(pos.x, pos.y, this.angle);
-        Rectangle2D cartangle = new Rectangle2D(pos.x - length/2, pos.y - width/2, length, width);
-        SimplePolygon2D carToDraw = cartangle.transform(at);
-        
-        g2d.setColor(fillColor);
-        carToDraw.fill(g2d);
-        g2d.setColor(cirColor);
-        carToDraw.draw(g2d);
-         */
 
         //Car
         AffineTransform at = AffineTransform.getRotateInstance(this.angle, pos.x, pos.y);

@@ -60,6 +60,8 @@ public class CarAI extends Car {
     public void applyBrainOutput(ArrayList<Double> output) {
         setForce(output.get(0));
         setRotation(output.get(1));
+        
+        System.out.println("Outputs: "+output.get(0)+";"+output.get(1));
     }
     
     public ArrayList<Double> measureDistance() {
@@ -68,6 +70,8 @@ public class CarAI extends Car {
         inputs.add(getsLeft().getDistanceToBarrier());
         inputs.add(getsMid().getDistanceToBarrier());
         inputs.add(getsRight().getDistanceToBarrier());
+        
+        //System.out.println("Inputs: "+inputs.get(0)+";"+inputs.get(1)+";"+inputs.get(2));
         
         return inputs;
     }
@@ -97,6 +101,8 @@ public class CarAI extends Car {
         sMid.paint(gr, showSensors);
         
         brain.think(measureDistance());
+        
+        brain.paint(gr, pg);
         //System.out.println("Dist: "+sLeft.getDistanceToBarrier());
     }
 }
