@@ -72,7 +72,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         cars = new ArrayList();
         carsToRemove = new ArrayList();
         
-        spawn = new Spawn(this, new Point(getScaledValue(50),getScaledValue(50)));
+        spawn = new Spawn(this, new Point(50,50));
 
         newBar = new Point(-1,-1);
         

@@ -7,12 +7,10 @@ package geneticGame.neuralNetwork;
 
 import geneticGame.CarAI;
 import geneticGame.Playground;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import java.util.ArrayList;
-import math.geom2d.conic.Circle2D;
 /**
  *
  * @author Denis Kurka
@@ -20,35 +18,37 @@ import math.geom2d.conic.Circle2D;
 public class NeuralNetwork {
     private CarAI car;
     
-    private NeuronLayer input;
-    private NeuronLayer output;
-    private NeuronLayer hiddenLayer1;
-    private NeuronLayer hiddenLayer2;
+    private ArrayList<ArrayList<ArrayList<Double>>> brainData;
+
+    private ArrayList<NeuronLayer> neuronLayers;
     
     private ArrayList<Double> outputActs;
     
-    public NeuralNetwork(CarAI car) {
+    
+    
+    public NeuralNetwork(CarAI car, ArrayList<ArrayList<ArrayList<Double>>> brainData) {
+        this.brainData = brainData;
         this.car = car;
         
-        input = new NeuronLayer(3);
-        hiddenLayer1 = new NeuronLayer(4, input);
-        hiddenLayer2 = new NeuronLayer(3, hiddenLayer1);
-        output = new NeuronLayer(2, hiddenLayer2);
+        neuronLayers = new ArrayList<>();
         
-        outputActs = new ArrayList();
+        neuronLayers.add(new NeuronLayer(3));
+        for(int i = 1; i <= brainData.size(); i++) {
+            neuronLayers.add(new NeuronLayer(neuronLayers.get(i-1), brainData.get(i-1)));
+        }
     }
     
     public void think(ArrayList<Double> inputs) {
-        input.setActivations(inputs);
+        neuronLayers.get(0).setActivations(inputs);
         
-        hiddenLayer1.calculateActivations();
+        for(NeuronLayer nl : neuronLayers) {
+            if(nl.isIsInput()) continue;
+            
+            nl.calculateActivations();
+        }
         
-        hiddenLayer2.calculateActivations();
-        
-        output.calculateActivations();
-        
-        outputActs.clear();
-        outputActs = output.getActivations();
+        outputActs = new ArrayList<>();
+        outputActs = neuronLayers.get(brainData.size()).getActivations();
         
         car.applyBrainOutput(outputActs);
     }
@@ -56,42 +56,14 @@ public class NeuralNetwork {
     public void paint(Graphics gr, Playground pg) {
         Graphics2D g2d = (Graphics2D)gr;
         
-        int maxOffset = 100;
-        
-        int i = 0;
-        for(Neuron n : input.getNeurons()) {
-            Circle2D nCir = new Circle2D(pg.getWidth()-pg.getScaledValue(100), pg.getScaledValue((maxOffset/input.getNeuronCount()))*i, pg.getScaledValue(5));
-            g2d.setColor(Color.red);
-            nCir.fill(g2d);
-            
-            i++;
+        for(int i = 0; i < brainData.size()+1; i++) {
+            neuronLayers.get(i).paintNeurons(g2d, pg, i*30);
         }
         
-        i = 0;
-        for(Neuron n : hiddenLayer1.getNeurons()) {
-            Circle2D nCir = new Circle2D(pg.getWidth()-pg.getScaledValue(80), pg.getScaledValue((maxOffset/hiddenLayer1.getNeuronCount()))*i, pg.getScaledValue(5));
-            g2d.setColor(Color.red);
-            nCir.fill(g2d);
+        for(NeuronLayer nl : neuronLayers) {
+            if(nl.isIsInput()) continue;
             
-            i++;
-        }
-        
-        i = 0;
-        for(Neuron n : hiddenLayer2.getNeurons()) {
-            Circle2D nCir = new Circle2D(pg.getWidth()-pg.getScaledValue(60), pg.getScaledValue((maxOffset/hiddenLayer2.getNeuronCount()))*i, pg.getScaledValue(5));
-            g2d.setColor(Color.red);
-            nCir.fill(g2d);
-            
-            i++;
-        }
-        
-        i = 0;
-        for(Neuron n : output.getNeurons()) {
-            Circle2D nCir = new Circle2D(pg.getWidth()-pg.getScaledValue(40), pg.getScaledValue((maxOffset/output.getNeuronCount()))*i, pg.getScaledValue(5));
-            g2d.setColor(Color.red);
-            nCir.fill(g2d);
-            
-            i++;
+            nl.paintWeights(g2d, pg);
         }
     }
 }

@@ -26,6 +26,8 @@ public abstract class GameObject {
 
     public GameObject(Playground pg, Point pos, Color fillColor, Color cirColor, double angle) {
         this.pg = pg;
+        pos.setLocation(pg.getScaledValue(pos.getX()), pg.getScaledValue(pos.getY()));
+        
         this.pos = pos;
         this.fillColor = fillColor;
         this.cirColor = cirColor;

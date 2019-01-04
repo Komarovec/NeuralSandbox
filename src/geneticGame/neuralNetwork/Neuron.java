@@ -6,7 +6,7 @@
 package geneticGame.neuralNetwork;
 
 import java.util.ArrayList;
-import java.util.Random;
+import math.geom2d.Point2D;
 
 /**
  *
@@ -18,11 +18,18 @@ public class Neuron {
     private double activation;
     private ArrayList<Double> weights;
     
+    private Point2D drawPoint;
+    
+    public Neuron(NeuronLayer nl, ArrayList<Double> weights) {
+        this.nl = nl;
+        this.activation = 0;
+        this.weights = weights;
+    }
+    
     public Neuron(NeuronLayer nl) {
         this.nl = nl;
         this.activation = 0;
-        
-        weights = new ArrayList();
+        this.weights = null;
     }
 
     //Getters and Setters
@@ -45,6 +52,15 @@ public class Neuron {
     public NeuronLayer getNl() {
         return nl;
     }
+
+    public Point2D getDrawPoint() {
+        return drawPoint;
+    }
+
+    public void setDrawPoint(Point2D drawPoint) {
+        this.drawPoint = drawPoint;
+    }
+
     //End of Getters and Setters
     
     public double activationFunction(double x) {
@@ -67,14 +83,5 @@ public class Neuron {
         }
         
         activation = activationFunction(act);
-    }
-    
-    public void randomWeights(int consCount) {
-        weights.clear();
-        
-        Random rand = new Random();
-        for (int i = 0; i < consCount; i++) {
-            weights.add((rand.nextDouble()*2)-1);
-        }
     }
 }

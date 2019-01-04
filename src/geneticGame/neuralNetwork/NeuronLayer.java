@@ -5,7 +5,12 @@
  */
 package geneticGame.neuralNetwork;
 
+import geneticGame.Playground;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
+import math.geom2d.Point2D;
+import math.geom2d.conic.Circle2D;
 
 /**
  *
@@ -16,14 +21,13 @@ public class NeuronLayer {
     private NeuronLayer sourceLayer;
     private boolean isInput;
     
-    public NeuronLayer(int neuronCount, NeuronLayer sourceLayer) {
+    public NeuronLayer(NeuronLayer sourceLayer, ArrayList<ArrayList<Double>> weights) {
         this.sourceLayer = sourceLayer;
+        this.neurons = new ArrayList();
         
-        neurons = new ArrayList();
-        
+        int neuronCount = weights.size();
         for(int i = 0; i < neuronCount; i++) {
-            neurons.add(new Neuron(this));
-            neurons.get(i).randomWeights(sourceLayer.getNeuronCount());
+            neurons.add(new Neuron(this, weights.get(i)));
         }
         
         isInput = false;
@@ -95,4 +99,37 @@ public class NeuronLayer {
         
         return acts;
     }
+    
+    public void paintNeurons(Graphics2D g2d, Playground pg, int offset) {
+        for(int i = 0; i < this.getNeuronCount(); i++) {
+            Circle2D nCir = new Circle2D(pg.getWidth()-pg.getScaledValue(150)+pg.getScaledValue(offset), (pg.getScaledValue(30)*i) + pg.getScaledValue(50), pg.getScaledValue(5));
+            double act = this.getNeurons().get(i).getActivation();
+            g2d.setColor(new Color((float)act ,0, 0));
+            nCir.fill(g2d);
+            
+            this.getNeurons().get(i).setDrawPoint(nCir.center());
+        }
+    }
+    
+    public void paintWeights(Graphics2D g2d, Playground pg) {
+        if(isInput) return;
+        
+        for(int i = 0; i < this.getNeuronCount(); i++) {
+            for(int j = 0; j < sourceLayer.getNeuronCount(); j++) {
+                Point2D c1 = this.getNeurons().get(i).getDrawPoint();
+                Point2D c2 = sourceLayer.getNeurons().get(j).getDrawPoint();
+                
+                double weight = this.getNeurons().get(i).getWeights().get(j);
+                if(weight > 0) {
+                     g2d.setColor(new Color(0, (float)weight, 0));
+                }
+                else {
+                     g2d.setColor(new Color(-(float)weight, 0, 0));
+                }
+                
+                g2d.drawLine((int)c1.x(), (int)c1.y(), (int)c2.x(), (int)c2.y());
+            }
+        }
+    }
+    
 }

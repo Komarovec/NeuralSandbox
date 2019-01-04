@@ -8,12 +8,14 @@ package geneticGame;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import java.awt.Dimension;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -180,6 +182,21 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public boolean saveLevel() {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogType(1);
+        fc.setCurrentDirectory(new File("."));
+        
+        String path;
+        
+        int returnVal = fc.showSaveDialog(this);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            path = fc.getSelectedFile().getPath();
+        }
+        else {
+            return false;
+        }
+        
         XStream xstream = new XStream(new DomDriver()); 
         ArrayList<BarrierSkeleton> skelBars = new ArrayList();
         for(Barrier b : pg.getBarriers()) {
@@ -187,7 +204,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
         String xml = xstream.toXML(skelBars);
         
-        try (PrintWriter out = new PrintWriter("level.xml")) {
+        try (PrintWriter out = new PrintWriter(path)) {
             out.println(xml);
             return true;
         }
@@ -198,9 +215,24 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     public boolean loadLevel() {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogType(1);
+        fc.setCurrentDirectory(new File("."));
+        
+        String path;
+        
+        int returnVal = fc.showOpenDialog(this);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            path = fc.getSelectedFile().getPath();
+        }
+        else {
+            return false;
+        }
+        
         XStream xstream = new XStream(new DomDriver()); 
         try {
-            String xml = readFile("level.xml", Charset.defaultCharset());
+            String xml = readFile(path, Charset.defaultCharset());
             ArrayList<BarrierSkeleton> skelBars = (ArrayList<BarrierSkeleton>)xstream.fromXML(xml);
             
             ArrayList<Barrier> bars = new ArrayList();
