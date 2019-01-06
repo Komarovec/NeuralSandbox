@@ -60,14 +60,14 @@ public class Neuron {
     public void setDrawPoint(Point2D drawPoint) {
         this.drawPoint = drawPoint;
     }
-
     //End of Getters and Setters
     
+    //Aktivační funkce --> Mat. fce Sigmoid
     public double activationFunction(double x) {
-        //Aktivační funkce --> Mat. fce Sigmoid
         return (1/( 1 + Math.pow(Math.E,(-1*x))));
     }
     
+    //Aktivace neuronu podle všech vah --> a = (w * i) + (w1 * i1) + (w2 * i2) ...
     public void activate(ArrayList<Double> sourceActivations) {
         if(sourceActivations.isEmpty() || weights.isEmpty()) {
             System.out.println("Can't activate! No weights!");

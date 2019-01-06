@@ -98,4 +98,49 @@
     <width>144</width>
     <angle>0.0</angle>
   </geneticGame.BarrierSkeleton>
+  <geneticGame.BarrierSkeleton>
+    <s>
+      <x>1021</x>
+      <y>14</y>
+    </s>
+    <lenght>399</lenght>
+    <width>83</width>
+    <angle>0.0</angle>
+  </geneticGame.BarrierSkeleton>
+  <geneticGame.BarrierSkeleton>
+    <s>
+      <x>619</x>
+      <y>764</y>
+    </s>
+    <lenght>1108</lenght>
+    <width>177</width>
+    <angle>0.0</angle>
+  </geneticGame.BarrierSkeleton>
+  <geneticGame.BarrierSkeleton>
+    <s>
+      <x>35</x>
+      <y>487</y>
+    </s>
+    <lenght>75</lenght>
+    <width>605</width>
+    <angle>0.0</angle>
+  </geneticGame.BarrierSkeleton>
+  <geneticGame.BarrierSkeleton>
+    <s>
+      <x>21</x>
+      <y>81</y>
+    </s>
+    <lenght>53</lenght>
+    <width>260</width>
+    <angle>0.0</angle>
+  </geneticGame.BarrierSkeleton>
+  <geneticGame.BarrierSkeleton>
+    <s>
+      <x>449</x>
+      <y>4</y>
+    </s>
+    <lenght>868</lenght>
+    <width>20</width>
+    <angle>0.0</angle>
+  </geneticGame.BarrierSkeleton>
 </list>

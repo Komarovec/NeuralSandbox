@@ -47,6 +47,10 @@ public class Spawn extends GameObject {
         return new Point((int)Math.round(pos.x+radius*1.5),(int)Math.round(pos.y+radius*1.5));
     }
     
+    public void setSpawnpoint(Point a) {
+        this.setPos(new Point((int)Math.round(a.x-1.5*radius), (int)Math.round(a.y-1.5*radius)));
+    }
+    
     public int getRadius() {
         return radius;
     }
@@ -54,7 +58,6 @@ public class Spawn extends GameObject {
     public void setRadius(int radius) {
         this.radius = radius;
     }
-
     //End of Getters and Setters
     @Override
     public void paint(Graphics gr) {

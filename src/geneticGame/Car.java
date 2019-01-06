@@ -43,6 +43,8 @@ public class Car {
     protected int maxSpeed;
     protected double acceleration;
     
+    protected boolean frozen;
+    
     public Car(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor, int angle) {    
         this.setPg(pg);
         this.setPos(pos);
@@ -51,6 +53,8 @@ public class Car {
         this.setFillColor(fillColor);
         this.setCirColor(cirColor);
         this.setAngle(angle);
+        
+        frozen = false;
         
         forceToAdd = new double[2];
         forceToAdd[0] = 0;
@@ -144,17 +148,23 @@ public class Car {
         this.angle = angle;
     }
 
-    
-
     public Area getArea() {
         return area;
+    }
+    
+    public boolean isFrozen() {
+        return frozen;
+    }
+
+    public void setFrozen(boolean frozen) {
+        this.frozen = frozen;
     }
     // End of Getters and Setters
     
     
     //Zjištije kolizi s dannou Areou
     public boolean detectCollision(Area colArea) {
-        return (area.getBounds2D().intersects(colArea.getBounds2D()));
+        return (this.area.intersects(colArea.getBounds2D()) && colArea.intersects(this.area.getBounds2D()));
     }
     
     
@@ -293,8 +303,10 @@ public class Car {
         g2d.fill(area);
         g2d.setColor(cirColor);
         g2d.draw(area);
-  
-        this.move();
-        this.rotateManual();
+        
+        if(!frozen) {
+            this.move();
+            this.rotateManual();
+        }
     }
 }

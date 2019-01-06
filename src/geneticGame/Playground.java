@@ -5,6 +5,7 @@
  */
 package geneticGame;
 
+import geneticGame.genetics.Population;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -31,11 +32,13 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     
     private Timer timer;
     private ArrayList<Barrier> barriers;
-    private ArrayList<CarAI> cars;
-    private ArrayList<CarAI> carsToRemove;
+    private ArrayList<Barrier> barriersToDelete;
     
-    private Car controled;
+    private CarAI controled;
     private Spawn spawn;
+    private Finish finish;
+    
+    private Population population;
     
     private final Dimension screenSize;
     private double scaleIndexX; //Přepokládá že poměr stran je 16:9
@@ -45,7 +48,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     private Point newBar;
     private Barrier tempBarrier;
     
-    private int stater; //0 - Wait; 1 - Create Mode; 2 - Delete Mode
+    private int stater; //0 - Wait; 1 - Create Mode; 2 - Change angle mode; 3 - Delete Mode; 4 - Change positions; 5 - Change position spawn
     
     
     public Playground(MainFrame mf) {
@@ -69,16 +72,17 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         timer = new Timer(10,this);
         timer.start();
         barriers = new ArrayList();
-        cars = new ArrayList();
-        carsToRemove = new ArrayList();
+        barriersToDelete = new ArrayList();
         
         spawn = new Spawn(this, new Point(50,50));
+        finish = new Finish(this, new Point(this.getTrueValue(this.getWidth())-100, this.getTrueValue(this.getHeight())-100));
 
         newBar = new Point(-1,-1);
         
         stater = 0;
         
-        newCar(new CarAI(this, spawn.getSpawnpoint()));
+        population = null;
+        controled = null;
     }
 
     public ArrayList<Barrier> getBarriers() {
@@ -88,7 +92,22 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     public void setBarriers(ArrayList<Barrier> barriers) {
         this.barriers = barriers;
     }
-    
+
+    public Spawn getSpawn() {
+        return spawn;
+    }
+
+    public void setSpawn(Spawn spawn) {
+        this.spawn = spawn;
+    }
+
+    public Finish getFinish() {
+        return finish;
+    }
+
+    public void setFinish(Finish finish) {
+        this.finish = finish;
+    }
     //Funkce zajištující škálování
     public Dimension getScreenSize() {
         return screenSize;
@@ -113,34 +132,37 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     public double getScaleIndexX() {
         return scaleIndexX;
     }
+    //Konec funkci zajištující škálování
+
     
-    public void inFinish(CarAI car) {
-        carsToRemove.add(car);
-    }
-    
-    //Zajištuje korektní přidání do pole individuálu
-    public void newCar(CarAI car) {
-        cars.add(car);
-        controled = car;
-    }
-    
+    //Smaž barieru pokud je na pointu
     public boolean deleteBarrierFromPoint(Point a) {
-        if(barriers.isEmpty())
+        Barrier del = getBarrierFromPoint(a);
+        if(del == null) {
             return false;
+        }
+        else {
+            barriers.remove(del);
+            return true;
+        }
+    }
+    
+    public Barrier getBarrierFromPoint(Point a) {
+        if(barriers.isEmpty())
+            return null;
         
         for(Barrier item : barriers) {
             if(item.getArea().contains(a)) {
-                barriers.remove(item);
-                return true;
+                return item;
             }
         }
-        return false;
+        return null;
     }
     
     //Zapne mod likvidaci barier
     public void deleteBarrier() {
-        if(stater == 2) return;
-        stater = 2;
+        if(stater == 3) return;
+        stater = 3;
     }
      
     //Zapne mod tvoření barier
@@ -149,69 +171,76 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         stater = 1;
     }
      
+    //Zapne mod pro menění barier
+    public void changeBarrier() {
+        if(stater == 4) return;
+        stater = 4;
+    }
+    
     @Override
     protected void paintComponent(Graphics gr) {
-        super.paintComponent(gr); //To change body of generated methods, choose Tools | Templates.  
+        super.paintComponent(gr);
         
-        //Vykresli spawn a finish
+        //Vykresli spawn
         spawn.paint(gr);
+        
+        //Vykresli finish
+        finish.paint(gr);
         
         //Vykresli bariery
         if(!barriers.isEmpty()) {
             barriers.forEach((item) -> {
-                item.paint(gr);
+                if(item != null) {
+                    item.paint(gr);
+                }
+                    
+                else {
+                    barriersToDelete.add(item);
+                }
             });
         }
         
+        if(!barriersToDelete.isEmpty()) {
+            for(Barrier b : barriersToDelete) {
+                barriers.remove(b);
+            }
+            barriersToDelete.clear();
+        }
+        
+        //Vykresli tvořící se barierů
         if(tempBarrier != null) {
             tempBarrier.paint(gr);
         }
         
-        //Iteruj pro všechny individualy
-        if(!cars.isEmpty()) {
-            cars.forEach((CarAI car) -> {
-                car.paint(gr);
-                
-                /*Defaultni barva senzoru
-                car.getS1().setFillColor(Color.CYAN);
-                car.getS2().setFillColor(Color.CYAN);
-                */
-                
-                //Nabourání do bariery
-                barriers.forEach((br) -> {
-                    //Kolize s autem
-                    if(car.detectCollision(br.getArea()))
-                        carsToRemove.add(car);
-                    
-                    /*
-                    //Sepnuti senzorů
-                    if(car.getS1().detectCollision(br.getArea()))
-                        car.getS1().setFillColor(Color.RED);
-                    
-                    if(car.getS2().detectCollision(br.getArea()))
-                        car.getS2().setFillColor(Color.RED);
-                    */
-                });         
-            });
-        }
-        else {
-            //Žadní individuálové ve hře
-            newCar(new CarAI(this, spawn.getSpawnpoint()));
+        //Vykresli populaci
+        if(population != null) {
+            population.paint(gr);
         }
         
-        if(!carsToRemove.isEmpty()) {
-            carsToRemove.forEach((car) -> {
-                cars.remove(car);
-            });
+        //Vykresli hrače
+        if(controled != null) {
+            controled.paint(gr);
+            controled.paintBrain(gr);
         }
     }
     
+    public void startEvolution() {
+        controled = null;
+        population = new Population(this, 200);
+    }
+    
+    public void spawnPlayer() {
+        population = null;
+        controled = new CarAI(this, spawn.getSpawnpoint());
+        controled.setPlayerControl(true);
+    }
+    
+    //Loop funkce
     @Override
     public void actionPerformed(ActionEvent ae) {
         this.repaint();
     }
 
-    
     //Manuální ovládání
     @Override
     public void keyTyped(KeyEvent e) {
@@ -262,14 +291,33 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     public void mouseDragged(MouseEvent e) {
         //Posuvná bariera
         if(stater == 1 && newBar.x != -1) {
-            tempBarrier = new Barrier(this ,newBar, e.getPoint(), 0);
-            System.out.println("Creating new barrier ");
+            if(newBar.y != e.getPoint().y || newBar.x != e.getPoint().x) {
+                tempBarrier = new Barrier(this ,newBar, e.getPoint(), 0);
+                System.out.println("Creating new barrier ");
+            }
+            else {
+                tempBarrier = null;
+                System.out.println("Cant create barrier points too close! ");
+            }
+        }
+        
+        else if(stater == 4 && tempBarrier != null) {
+            tempBarrier.setPos(e.getPoint());
+        }
+        else if(stater == 5) {
+            spawn.setSpawnpoint(e.getPoint());
         }
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
         mousePos = e.getPoint();
+        
+        //Otáčej barieru
+        if(stater == 2 && newBar.x != -1) {
+            tempBarrier.setAngle(((double)e.getPoint().y/(double)this.getHeight())*2*Math.PI);
+            System.out.println("Rotating new barrier.");
+        }
     }
 
     @Override
@@ -279,31 +327,66 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     @Override
     public void mousePressed(MouseEvent e) {
         //Vytváření bariery
-        if(stater == 1)
+        if(stater == 1) {
             newBar = e.getPoint();
+            tempBarrier = null;
+        }
+        
+        //Otáčení
+        else if(stater == 2) {
+            //Přestaň vytvářet
+            if(tempBarrier != null) {
+                barriers.add(tempBarrier);
+                tempBarrier = null;
+            }
+
+            //Reset
+            newBar = new Point(-1,-1);
+            stater = 0;
+        }
         
         //Mazaní bariery
-        else if(stater == 2)
+        else if(stater == 3)
             deleteBarrierFromPoint(e.getPoint());
 
+        //Měnění pozice bariery
+        else if(stater == 4) {
+            tempBarrier = getBarrierFromPoint(e.getPoint());
+            if(tempBarrier == null && spawn.getArea().contains(e.getPoint())) {
+                stater = 5;
+            }
+            barriers.remove(tempBarrier);
+        }
+        
         System.out.println("Pressed: "+newBar);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(stater == 1) {
-            //Vytvoř barieru na pevno
-            barriers.add(tempBarrier);
-            tempBarrier = null;
-            
-            //Reset
-            newBar = new Point(-1,-1);
-            stater = 0;
+        switch (stater) {
+            case 1:
+                //Začni otáčet
+                stater = 2;
+                break;
+            case 3:
+                //Reset
+                stater = 0;
+                break;
+            case 4:
+                //Reset
+                barriers.add(tempBarrier);
+                stater = 0;
+                tempBarrier = null;
+                break;
+            case 5:
+                //Reset
+                stater = 0;
+                tempBarrier = null;
+                break;
+            default:
+                break;
         }
-        else if(stater == 2) {
-            //Reset
-            stater = 0;
-        }
+        
         
         System.out.println("Released");
     }

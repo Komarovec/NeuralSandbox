@@ -117,10 +117,14 @@ public class Sensor {
                 Area intersection = new Area(b.getArea());
                 intersection.intersect(this.area);
                 
+                if(intersection.isEmpty()) continue;
+                
                 Rectangle2D intersectRect = intersection.getBounds2D();
                 
                 Box2D barPrecise = new Box2D(intersectRect);
+                
                 double distance = barPrecise.asRectangle().distance(new Point2D(car.getPos().x, car.getPos().y));
+                //barPrecise.fill(g2d);
                 
                 if(distance < minDistance) {
                     minDistance = distance;

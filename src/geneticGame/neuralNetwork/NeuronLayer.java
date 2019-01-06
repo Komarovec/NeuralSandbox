@@ -67,6 +67,7 @@ public class NeuronLayer {
     }
     //End of Getters and Setters
     
+    //Přečte aktivace jiý aktivované neuronove vrsty a podle toho aktivuje všechny neurony
     public void calculateActivations() {
         ArrayList<Double> sourceActivations = new ArrayList();
         
@@ -79,10 +80,7 @@ public class NeuronLayer {
         }
     }
     
-    public void setWeights() {
-        //Set DNA
-    }
-    
+    //"Na tvrdo" nastaví aktivace neuronů --> Hodí se pro input layer kde váhy nejsou potřeba
     public void setActivations(ArrayList<Double> acts) {
         int i = 0;
         for(Neuron n : neurons) {
@@ -91,6 +89,7 @@ public class NeuronLayer {
         }
     }
     
+    //Zjistí aktivace neuronů
     public ArrayList<Double> getActivations() {
         ArrayList<Double> acts = new ArrayList();
         for(Neuron n : neurons) {
@@ -100,6 +99,7 @@ public class NeuronLayer {
         return acts;
     }
     
+    //Zobrazí neurony graficky
     public void paintNeurons(Graphics2D g2d, Playground pg, int offset) {
         for(int i = 0; i < this.getNeuronCount(); i++) {
             Circle2D nCir = new Circle2D(pg.getWidth()-pg.getScaledValue(150)+pg.getScaledValue(offset), (pg.getScaledValue(30)*i) + pg.getScaledValue(50), pg.getScaledValue(5));
@@ -111,6 +111,8 @@ public class NeuronLayer {
         }
     }
     
+    
+    //Zobrazí spojení mezi neurony graficky
     public void paintWeights(Graphics2D g2d, Playground pg) {
         if(isInput) return;
         

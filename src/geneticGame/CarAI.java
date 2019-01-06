@@ -21,17 +21,19 @@ import java.util.Random;
  */
 public class CarAI extends Car {
     private NeuralNetwork brain;
+    private double fitness;
     
     private ArrayList<Sensor> sensors;
     
     private int sLenght;
     private boolean showSensors;
+    private boolean playerControl;
     
     public CarAI(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor, int angle, ArrayList<ArrayList<ArrayList<Double>>> brainData) {
         super(pg, pos, length, width, fillColor, cirColor, angle);
-
+        
         sensors = new ArrayList<>();
-        sLenght = 150;
+        sLenght = 200;
         sensors.add(new Sensor(this, sLenght, 1, 5, Color.CYAN, Color.BLACK, -Math.PI/4));
         sensors.add(new Sensor(this, sLenght, 1, 5, Color.CYAN, Color.BLACK, Math.PI/4));
         sensors.add(new Sensor(this, sLenght, 1, 5, Color.CYAN, Color.BLACK, 0));
@@ -40,6 +42,10 @@ public class CarAI extends Car {
         if(brainData == null) {
             brainData = generateRandomBrainData(new ArrayList<>(Arrays.asList(3,2)));
         }
+        
+        fitness = 0;
+        playerControl = false;
+        
         brain = new NeuralNetwork(this, brainData);
     }
     
@@ -75,8 +81,31 @@ public class CarAI extends Car {
     public void setSensors(ArrayList sensors) {    
         this.sensors = sensors;
     }
+
+    public double getFitness() {
+        return fitness;
+    }
+
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
+    }
+
+    public boolean isPlayerControl() {
+        return playerControl;
+    }
+
+    public void setPlayerControl(boolean playerControl) {
+        this.playerControl = playerControl;
+    }
     //End of Getters and Setters
     
+    public void calculateFitness() {
+        double rawFitness = 1/((this.pos.distance(pg.getFinish().getFinishpoint())/pg.getSpawn().pos.distance(pg.getFinish().getFinishpoint())));
+        
+        this.fitness = Math.pow(rawFitness,4);
+    }
+    
+    //Vygenerování náhodnách vah do neuronové site
     public final ArrayList<ArrayList<ArrayList<Double>>> generateRandomBrainData(ArrayList<Integer> layers) {
         ArrayList<ArrayList<ArrayList<Double>>> brainData = new ArrayList<>();
         
@@ -106,13 +135,29 @@ public class CarAI extends Car {
         return brainData;
     }
     
+    //Pouzit vystup NS do pohybovych funkci auta
     public void applyBrainOutput(ArrayList<Double> output) {
-        setForce(output.get(0));
+        if(playerControl) return;
+        
+        double force = output.get(0);
+        
+        /*
+        if(force > 0.5) {
+            force = 1.4*force-0.4;
+        }
+        else {
+            force = 1.4*force-1;
+        }
+        */
+
+        setForce(force);
         setRotation(output.get(1));
         
         //System.out.println("Outputs: "+output.get(0)+";"+output.get(1));
     }
     
+    
+    //Zmeří a zabalí vzdálenosti od nejblizsích barier do pole
     public ArrayList<Double> measureDistance() {
         ArrayList<Double> inputs = new ArrayList();
         
@@ -125,14 +170,17 @@ public class CarAI extends Car {
         return inputs;
     }
     
+    //Sensory jsou viditelne
     public boolean isShowSensors() {
         return showSensors;
     }
 
+    //Zapnout/Vypnout viditelnost senzoru
     public void setShowSensors(boolean showSensors) {
         this.showSensors = showSensors;
     }
 
+    //Vykresli obsah
     public void drawArea(Graphics2D g2d ,Area area) {
         g2d.setColor(this.fillColor);
         g2d.fill(area);
@@ -145,13 +193,17 @@ public class CarAI extends Car {
         super.paint(gr);
         Graphics2D g2d = (Graphics2D)gr;
         
-        for(Sensor s : sensors) {
-            s.paint(gr, showSensors);
+        if(!this.frozen) {
+            for(Sensor s : sensors) {
+                s.paint(gr, showSensors);
+            }
+
+            brain.think(measureDistance());
+            //System.out.println("Dist: "+sLeft.getDistanceToBarrier());
         }
-        
-        brain.think(measureDistance());
-        
+    }
+    
+    public void paintBrain(Graphics gr) {
         brain.paint(gr, pg);
-        //System.out.println("Dist: "+sLeft.getDistanceToBarrier());
     }
 }

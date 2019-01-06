@@ -8,6 +8,7 @@ package geneticGame;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -49,7 +50,10 @@ public class MainFrame extends javax.swing.JFrame {
 
         jToolBar1 = new javax.swing.JToolBar();
         createBarrierButton = new javax.swing.JButton();
+        changeButton = new javax.swing.JButton();
         deleteButton = new javax.swing.JButton();
+        startButton = new javax.swing.JButton();
+        spawnPlayer = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         saveItem = new javax.swing.JMenuItem();
@@ -72,6 +76,17 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(createBarrierButton);
 
+        changeButton.setText("Change");
+        changeButton.setFocusable(false);
+        changeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        changeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        changeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                changeButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(changeButton);
+
         deleteButton.setText("Delete");
         deleteButton.setFocusable(false);
         deleteButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -82,6 +97,28 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(deleteButton);
+
+        startButton.setText("Start Evolution");
+        startButton.setFocusable(false);
+        startButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        startButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        startButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                startButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(startButton);
+
+        spawnPlayer.setText("Spawn car");
+        spawnPlayer.setFocusable(false);
+        spawnPlayer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        spawnPlayer.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        spawnPlayer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                spawnPlayerActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(spawnPlayer);
 
         fileMenu.setText("File");
 
@@ -139,6 +176,18 @@ public class MainFrame extends javax.swing.JFrame {
     private void loadItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadItemActionPerformed
         loadLevel();
     }//GEN-LAST:event_loadItemActionPerformed
+
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
+        pg.startEvolution();
+    }//GEN-LAST:event_startButtonActionPerformed
+
+    private void changeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeButtonActionPerformed
+        pg.changeBarrier();
+    }//GEN-LAST:event_changeButtonActionPerformed
+
+    private void spawnPlayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_spawnPlayerActionPerformed
+        pg.spawnPlayer();
+    }//GEN-LAST:event_spawnPlayerActionPerformed
 
     /**
      * @param args the command line arguments
@@ -203,6 +252,8 @@ public class MainFrame extends javax.swing.JFrame {
             skelBars.add(b.getSkeleton());
         }
         String xml = xstream.toXML(skelBars);
+        xml += '\n';
+        xml += xstream.toXML(pg.getSpawn().getPos());
         
         try (PrintWriter out = new PrintWriter(path)) {
             out.println(xml);
@@ -233,7 +284,14 @@ public class MainFrame extends javax.swing.JFrame {
         XStream xstream = new XStream(new DomDriver()); 
         try {
             String xml = readFile(path, Charset.defaultCharset());
-            ArrayList<BarrierSkeleton> skelBars = (ArrayList<BarrierSkeleton>)xstream.fromXML(xml);
+            
+            String x1 = xml.substring(0, xml.indexOf("<java.awt.Point"));
+            String x2 = xml.substring(xml.indexOf("<java.awt.Point"));
+            
+            ArrayList<BarrierSkeleton> skelBars = (ArrayList<BarrierSkeleton>)xstream.fromXML(x1);
+            Point spawnPoint = (Point)xstream.fromXML(x2);
+            
+            pg.getSpawn().setPos(spawnPoint);
             
             ArrayList<Barrier> bars = new ArrayList();
             for(BarrierSkeleton bs : skelBars) {
@@ -249,6 +307,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton changeButton;
     private javax.swing.JButton createBarrierButton;
     private javax.swing.JButton deleteButton;
     private javax.swing.JMenu editMenu;
@@ -257,5 +316,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JMenuItem loadItem;
     private javax.swing.JMenuItem saveItem;
+    private javax.swing.JButton spawnPlayer;
+    private javax.swing.JButton startButton;
     // End of variables declaration//GEN-END:variables
 }
