@@ -28,8 +28,9 @@ public class CarAI extends Car {
     private int sLenght;
     private boolean showSensors;
     private boolean playerControl;
+    private boolean feedbackSensor;
     
-    public CarAI(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor, int angle, ArrayList<ArrayList<ArrayList<Double>>> brainData) {
+    public CarAI(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor, int angle, boolean feedbackSensor, ArrayList<ArrayList<ArrayList<Double>>> brainData, ArrayList<Integer> brainTemplate) {
         super(pg, pos, length, width, fillColor, cirColor, angle);
         
         sensors = new ArrayList<>();
@@ -37,10 +38,12 @@ public class CarAI extends Car {
         sensors.add(new Sensor(this, sLenght, 1, 5, Color.CYAN, Color.BLACK, -Math.PI/4));
         sensors.add(new Sensor(this, sLenght, 1, 5, Color.CYAN, Color.BLACK, Math.PI/4));
         sensors.add(new Sensor(this, sLenght, 1, 5, Color.CYAN, Color.BLACK, 0));
-        showSensors = true;
+        showSensors = false;
+        
+        this.feedbackSensor = feedbackSensor;
         
         if(brainData == null) {
-            brainData = generateRandomBrainData(new ArrayList<>(Arrays.asList(3,2)));
+            brainData = generateRandomBrainData(brainTemplate);
         }
         
         fitness = 0;
@@ -50,19 +53,31 @@ public class CarAI extends Car {
     }
     
     public CarAI(Playground pg, Point pos) {
-        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, null);
+        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, false, null, new ArrayList<>(Arrays.asList(3,2)));
+    }
+    
+    public CarAI(ArrayList<Integer> brainTemplate, Playground pg, Point pos, boolean feedback) {
+        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, feedback, null, brainTemplate);
     }
     
     public CarAI(Playground pg) {
-        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, null);
+        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, false, null, new ArrayList<>(Arrays.asList(3,2)));
     }
     
-    public CarAI(Playground pg, Point pos, ArrayList<ArrayList<ArrayList<Double>>> brainData) {
-        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, brainData);
+    public CarAI(Playground pg, Point pos, ArrayList<ArrayList<ArrayList<Double>>> brainData, boolean feedback) {
+        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, feedback, brainData, new ArrayList<>(Arrays.asList(3,2)));
     }
     
-    public CarAI(Playground pg, ArrayList<ArrayList<ArrayList<Double>>> brainData) {
-        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, brainData);
+    public CarAI(Playground pg, ArrayList<ArrayList<ArrayList<Double>>> brainData, boolean feedback) {
+        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, feedback, brainData, new ArrayList<>(Arrays.asList(3,2)));
+    }
+    
+    public CarAI(Playground pg, Point pos, ArrayList<ArrayList<ArrayList<Double>>> brainData, ArrayList<Integer> brainTemplate, boolean feedback) {
+        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, feedback, brainData, brainTemplate);
+    }
+    
+    public CarAI(Playground pg, ArrayList<ArrayList<ArrayList<Double>>> brainData, ArrayList<Integer> brainTemplate, boolean feedback) {
+        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, feedback, brainData, brainTemplate);
     }
     
     //Getters and Setters
@@ -74,6 +89,10 @@ public class CarAI extends Car {
         this.brain = brain;
     }
 
+    public int getSensorsCount() {
+        return (feedbackSensor) ? sensors.size()+1 : sensors.size();
+    }
+    
     public ArrayList getSensors() {
         return sensors;
     }
@@ -102,7 +121,7 @@ public class CarAI extends Car {
     public void calculateFitness() {
         double rawFitness = 1/((this.pos.distance(pg.getFinish().getFinishpoint())/pg.getSpawn().pos.distance(pg.getFinish().getFinishpoint())));
         
-        this.fitness = Math.pow(rawFitness,4);
+        this.fitness = Math.pow(rawFitness,8);
     }
     
     //Vygenerování náhodnách vah do neuronové site
@@ -117,7 +136,7 @@ public class CarAI extends Car {
             int neuronConnections;
             
             if(i == 0) {
-                neuronConnections = sensors.size();
+                neuronConnections = getSensorsCount();
             }
             else {
                 neuronConnections = layers.get(i-1);
@@ -141,14 +160,7 @@ public class CarAI extends Car {
         
         double force = output.get(0);
         
-        /*
-        if(force > 0.5) {
-            force = 1.4*force-0.4;
-        }
-        else {
-            force = 1.4*force-1;
-        }
-        */
+        force = 3*force;
 
         setForce(force);
         setRotation(output.get(1));
@@ -165,7 +177,13 @@ public class CarAI extends Car {
             inputs.add(s.getDistanceToBarrier());
         }
         
-        //System.out.println("Inputs: "+inputs.get(0)+";"+inputs.get(1)+";"+inputs.get(2));
+        double finishDistance = 1-(this.pos.distance(pg.getFinish().getFinishpoint())/pg.getSpawn().getSpawnpoint().distance(pg.getFinish().getFinishpoint()));
+        
+        if(finishDistance < 0) finishDistance = 0;
+        
+        inputs.add(finishDistance);
+        
+        //System.out.println("Inputs: "+inputs.get(0)+";"+inputs.get(1)+";"+inputs.get(2)+";"+inputs.get(3));
         
         return inputs;
     }

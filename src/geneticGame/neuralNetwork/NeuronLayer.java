@@ -100,9 +100,9 @@ public class NeuronLayer {
     }
     
     //Zobrazí neurony graficky
-    public void paintNeurons(Graphics2D g2d, Playground pg, int offset) {
+    public void paintNeurons(Graphics2D g2d, Playground pg, int offset, int distance) {
         for(int i = 0; i < this.getNeuronCount(); i++) {
-            Circle2D nCir = new Circle2D(pg.getWidth()-pg.getScaledValue(150)+pg.getScaledValue(offset), (pg.getScaledValue(30)*i) + pg.getScaledValue(50), pg.getScaledValue(5));
+            Circle2D nCir = new Circle2D(pg.getWidth()-pg.getScaledValue(distance)+pg.getScaledValue(offset), (pg.getScaledValue(30)*i) + pg.getScaledValue(30), pg.getScaledValue(5));
             double act = this.getNeurons().get(i).getActivation();
             g2d.setColor(new Color((float)act ,0, 0));
             nCir.fill(g2d);

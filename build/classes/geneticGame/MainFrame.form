@@ -11,7 +11,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="saveItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Save Level"/>
+                <Property name="text" type="java.lang.String" value="Save level..."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="saveItemActionPerformed"/>
@@ -19,24 +19,75 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="loadItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Load Level"/>
+                <Property name="text" type="java.lang.String" value="Load level..."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadItemActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JToolBar$Separator" name="jSeparator1">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="saveBestBrainItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Save best brain..."/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="loadBrainItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Load brain..."/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JToolBar$Separator" name="jSeparator2">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="savePopulationItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Save population..."/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="loadPopulationItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Load population..."/>
+              </Properties>
+            </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="editMenu">
+        <Menu class="javax.swing.JMenu" name="settingsMenu">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Edit"/>
+            <Property name="text" type="java.lang.String" value="Settings"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="networkItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Neural network"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="networkItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="populationItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Population"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="populationItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="simulationItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Simulation"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="simulationItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
         </Menu>
       </SubComponents>
     </Menu>
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
+    <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="menuBar" type="java.lang.String" value="jMenuBar1"/>
@@ -123,15 +174,15 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="startButtonActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="spawnPlayer">
+        <Component class="javax.swing.JButton" name="nextgenButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Spawn car"/>
+            <Property name="text" type="java.lang.String" value="Nextgen"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="spawnPlayerActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextgenButtonActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

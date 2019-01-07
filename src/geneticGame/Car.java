@@ -40,8 +40,8 @@ public class Car {
     protected double accelConstant;
     protected double angleConstant;
     
-    protected int maxSpeed;
-    protected double acceleration;
+    protected double maxSpeed;
+    protected double maxSpeedConstant;
     
     protected boolean frozen;
     
@@ -71,8 +71,8 @@ public class Car {
         this.accelConstant = pg.getScaledValue(0.2); // --> MAX 1/5 --> 0.2 Experimentálně určeno
         this.angleConstant = 0.08; //cca Math.PI/40
         
-        this.acceleration = 0;
-        this.maxSpeed = (int)Math.round(pg.getScaledValue(3));
+        this.maxSpeed = pg.getScaledValue(3);
+        this.maxSpeedConstant = pg.getScaledValue(3);
     }
     
     public Car(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor) {
@@ -171,13 +171,13 @@ public class Car {
     // --- Ovládání binární {0,1} ---
     //Určuje sílu k zrychlení
     public void setForce(boolean isNegative) {
-        acceleration = (isNegative) ? -accelConstant : accelConstant;
+        this.maxSpeed = (isNegative) ? -maxSpeedConstant : maxSpeedConstant;
     }
     
     
     //Zastaví zrychlení
     public void stopForce() {
-        acceleration = 0;
+        maxSpeed = 0;
     }
     
     //Povoli rotaci
@@ -196,7 +196,7 @@ public class Car {
     //Pouze --> <-1; 1>
     public void setForce(double accel) {
         if(Math.abs(accel) > 1) return;
-        acceleration = pg.getScaledValue(accel/5);
+        maxSpeed = pg.getScaledValue(accel);
     }
     
     //Ovladací funkce - rotace --> Pouze <0; 1>
@@ -224,7 +224,7 @@ public class Car {
        
         //Zrychlení reaaly smooooth
         if(Math.abs(speed) < maxSpeed) {
-            speed += acceleration;
+            speed += accelConstant;
         }
         
 

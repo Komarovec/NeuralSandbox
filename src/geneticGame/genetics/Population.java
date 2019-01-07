@@ -5,6 +5,7 @@
  */
 package geneticGame.genetics;
 
+import geneticGame.Barrier;
 import geneticGame.CarAI;
 import geneticGame.Playground;
 import java.awt.Color;
@@ -22,12 +23,16 @@ import java.util.TimerTask;
 public final class Population {
     private Playground pg;
     
+    private ArrayList<Integer> brainTemplate;
     private ArrayList<CarAI> individuals;
     private ArrayList<CarAI> frozen;
+    private ArrayList<CarAI> carsToDelete;
     
+    private boolean carFeedbackSensor;
     private int popCount;
     private int generation;
     private int mutationRate;
+    private int timerDelay;
     private Timer timer;
     
     private Color avgColor;
@@ -35,20 +40,24 @@ public final class Population {
     
     private int stater; // 0 -- Waiting; 1 -- Testing; 2 -- Calculating/Mutating/Evolving  
     
-    public Population(Playground pg, int popCount) {
+    public Population(Playground pg, int popCount, int mutationRate, ArrayList<Integer> brainTemplate, boolean carFeedbackSensor, int timerDelay) {
         this.pg = pg;
         this.popCount = popCount;
+        this.brainTemplate = brainTemplate;
+        this.carFeedbackSensor = carFeedbackSensor;
+        this.timerDelay = timerDelay;
         generation = 0;
         
         timer = new Timer("test");
         
         individuals = new ArrayList<>();
         frozen = new ArrayList<>();
+        carsToDelete = new ArrayList<>();
         
         avgColor = Color.red;
         bestColor = Color.yellow;
         
-        mutationRate = 5;
+        this.mutationRate = mutationRate;
         
         generateRandomPopulation();
         startTest();
@@ -92,7 +101,7 @@ public final class Population {
     //Náhodná populace
     public void generateRandomPopulation() { 
         for(int i = 0; i < this.popCount; i++)
-           newCar(new CarAI(pg, pg.getSpawn().getSpawnpoint()));
+           newCar(new CarAI(brainTemplate, pg, pg.getSpawn().getSpawnpoint(), carFeedbackSensor));
     }
     
     //Sort
@@ -145,7 +154,7 @@ public final class Population {
         Random rand = new Random();
 
         ArrayList<CarAI> picked = new ArrayList<>();
-        int pickCount = (int)Math.ceil(this.popCount/10);
+        int pickCount = (int)Math.ceil(this.popCount/20);
        
         for(CarAI car : frozen) {
             fitnessSum += car.getFitness();
@@ -176,20 +185,16 @@ public final class Population {
         }
         
         individuals.clear();
-        
-        
-        //Nechání genů toho nejlepšího z generace
-        newCar(picked.get(0));
 
-        //Náhodné páření (z 1/10 nejlepších) do zbytku populace
-        for(int j = 0; j < this.popCount-1; j++) {
+        //Náhodné páření (z 1/10 nejlepších) do populace
+        for(int j = 0; j < this.popCount; j++) {
             int randomPick = rand.nextInt(pickCount);
             CarAI parent1 = picked.get(randomPick);
             
             randomPick = rand.nextInt(pickCount);
             CarAI parent2 = picked.get(randomPick);
             
-            CarAI temp = new CarAI(pg, pg.getSpawn().getSpawnpoint(), mergeBrains(parent1.getBrain().getBrainData(), parent2.getBrain().getBrainData()));
+            CarAI temp = new CarAI(pg, pg.getSpawn().getSpawnpoint(), mergeBrains(parent1.getBrain().getBrainData(), parent2.getBrain().getBrainData()), brainTemplate, carFeedbackSensor);
             newCar(temp);
         }
     }
@@ -203,14 +208,17 @@ public final class Population {
             public void run() {
                 endTest();
             }
-        }, 20000);
+        }, timerDelay);
     }
     
     //Ukonci testovani populace a zhodnoti jejich výsledky
     public void endTest() {
+        if(stater == 2) return;
         timer.cancel();
         
-        if(stater == 2) return;
+        System.out.println("-------------------------------");
+        System.out.println("Individuals: "+individuals.size()+" Frozen: "+frozen.size()+" Combined:"+(individuals.size()+frozen.size()));
+        System.out.println("-------------------------------");
         
         stater = 2;
         if(!individuals.isEmpty()) {
@@ -221,12 +229,18 @@ public final class Population {
         }
         individuals.clear();
 
+        //Refresh hodnot z UI
+        this.popCount = pg.getPopCount();
+        this.mutationRate = pg.getMutationRate();
+        this.timerDelay = pg.getPopulationTimerDelay();
+        
         //Do crossover, mutation and create offstrings frozen-->individuals
         crossover();
-        //mutation();
+        generation++;
         
         
         System.out.println(individuals.size());
+        System.out.println("Generation: "+generation);
         System.out.println("-------------------------------");
         
 
@@ -238,12 +252,7 @@ public final class Population {
     public void paint(Graphics gr) {
         //Iteruj pro všechny individualy
         if(!frozen.isEmpty()) {
-            for(int i = 0; i < frozen.size(); i++) {
-                CarAI car = frozen.get(i);
-                
-                if(!individuals.isEmpty()) {
-                    individuals.remove(car);
-                }
+            for(CarAI car : frozen) {
                 car.paint(gr);
             }
         }
@@ -252,28 +261,38 @@ public final class Population {
             individuals.get(0).paintBrain(gr);
             individuals.get(0).setFillColor(bestColor);
             
-            //Vykresli všechny auta a přesuň je
-            for(int i = 0; i < individuals.size(); i++) {         
-                CarAI car = individuals.get(i);
+            for(CarAI car : individuals) {
                 car.paint(gr);
-            }
-            
-            //Vypočítej fitness a urči nejlepšího
-            for(CarAI car : individuals) {
                 car.calculateFitness();
-            }
-            
-            for(CarAI car : individuals) {
+                
+                if(car.detectCollision(pg.getFinish().getArea())) {
+                    car.setFrozen(true);
+                    car.setFillColor(Color.PINK);
+                    frozen.add(car);
+                    carsToDelete.add(car);
+                    
+                    car.setFitness(Math.pow(car.getFitness(),4));
+                    System.out.println("Solution found!");
+                }
+                
                 //Nabourání do bariery
-                pg.getBarriers().forEach((br) -> {
-                    //Kolize s autem
+                for(Barrier br : pg.getBarriers()){
+                    //Kolize s autem              
                     if(car.detectCollision(br.getArea())) {
                         car.setFrozen(true);
-                        car.setFillColor(avgColor);
+                        car.setFillColor(Color.cyan);
+                        carsToDelete.add(car);
                         frozen.add(car);
+                        break;
                     }
-                });
+                }
             }
+            
+            for(CarAI car : carsToDelete) {
+                individuals.remove(car);
+            }
+            carsToDelete.clear();
+            
         }
         else {
             endTest();

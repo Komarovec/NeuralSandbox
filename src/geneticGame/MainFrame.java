@@ -7,6 +7,8 @@ package geneticGame;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import geneticGame.Dialogs.NeuralNetworkSetting;
+import geneticGame.Dialogs.PopulationSetting;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.File;
@@ -32,13 +34,18 @@ public class MainFrame extends javax.swing.JFrame {
         pg = new Playground(this);
         this.add(pg);
         Dimension screenS = new Dimension(
-            pg.getScaledValue(1200),
-            pg.getScaledValue(1000)
+            pg.getScaledValue(1100),
+            pg.getScaledValue(800)+100
         );
         this.setPreferredSize(screenS);
+        this.setSize(screenS);
         initComponents();
     }
 
+    public Playground getPlayground() {
+        return pg;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -53,14 +60,24 @@ public class MainFrame extends javax.swing.JFrame {
         changeButton = new javax.swing.JButton();
         deleteButton = new javax.swing.JButton();
         startButton = new javax.swing.JButton();
-        spawnPlayer = new javax.swing.JButton();
+        nextgenButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         saveItem = new javax.swing.JMenuItem();
         loadItem = new javax.swing.JMenuItem();
-        editMenu = new javax.swing.JMenu();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
+        saveBestBrainItem = new javax.swing.JMenuItem();
+        loadBrainItem = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
+        savePopulationItem = new javax.swing.JMenuItem();
+        loadPopulationItem = new javax.swing.JMenuItem();
+        settingsMenu = new javax.swing.JMenu();
+        networkItem = new javax.swing.JMenuItem();
+        populationItem = new javax.swing.JMenuItem();
+        simulationItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
@@ -109,20 +126,20 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(startButton);
 
-        spawnPlayer.setText("Spawn car");
-        spawnPlayer.setFocusable(false);
-        spawnPlayer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        spawnPlayer.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        spawnPlayer.addActionListener(new java.awt.event.ActionListener() {
+        nextgenButton.setText("Nextgen");
+        nextgenButton.setFocusable(false);
+        nextgenButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        nextgenButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        nextgenButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                spawnPlayerActionPerformed(evt);
+                nextgenButtonActionPerformed(evt);
             }
         });
-        jToolBar1.add(spawnPlayer);
+        jToolBar1.add(nextgenButton);
 
         fileMenu.setText("File");
 
-        saveItem.setText("Save Level");
+        saveItem.setText("Save level...");
         saveItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveItemActionPerformed(evt);
@@ -130,18 +147,57 @@ public class MainFrame extends javax.swing.JFrame {
         });
         fileMenu.add(saveItem);
 
-        loadItem.setText("Load Level");
+        loadItem.setText("Load level...");
         loadItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loadItemActionPerformed(evt);
             }
         });
         fileMenu.add(loadItem);
+        fileMenu.add(jSeparator1);
+
+        saveBestBrainItem.setText("Save best brain...");
+        fileMenu.add(saveBestBrainItem);
+
+        loadBrainItem.setText("Load brain...");
+        fileMenu.add(loadBrainItem);
+        fileMenu.add(jSeparator2);
+
+        savePopulationItem.setText("Save population...");
+        fileMenu.add(savePopulationItem);
+
+        loadPopulationItem.setText("Load population...");
+        fileMenu.add(loadPopulationItem);
 
         jMenuBar1.add(fileMenu);
 
-        editMenu.setText("Edit");
-        jMenuBar1.add(editMenu);
+        settingsMenu.setText("Settings");
+
+        networkItem.setText("Neural network");
+        networkItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                networkItemActionPerformed(evt);
+            }
+        });
+        settingsMenu.add(networkItem);
+
+        populationItem.setText("Population");
+        populationItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                populationItemActionPerformed(evt);
+            }
+        });
+        settingsMenu.add(populationItem);
+
+        simulationItem.setText("Simulation");
+        simulationItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                simulationItemActionPerformed(evt);
+            }
+        });
+        settingsMenu.add(simulationItem);
+
+        jMenuBar1.add(settingsMenu);
 
         setJMenuBar(jMenuBar1);
 
@@ -185,9 +241,30 @@ public class MainFrame extends javax.swing.JFrame {
         pg.changeBarrier();
     }//GEN-LAST:event_changeButtonActionPerformed
 
-    private void spawnPlayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_spawnPlayerActionPerformed
-        pg.spawnPlayer();
-    }//GEN-LAST:event_spawnPlayerActionPerformed
+    private void nextgenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextgenButtonActionPerformed
+        pg.nextgen();
+    }//GEN-LAST:event_nextgenButtonActionPerformed
+
+    private void networkItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_networkItemActionPerformed
+        NeuralNetworkSetting nns = new NeuralNetworkSetting(this, true, pg);
+        nns.setVisible(true);
+        pg.setBrainTemplate(nns.getNeuronModel());
+        pg.setCarFeedbackSensor(nns.isFeedback());
+    }//GEN-LAST:event_networkItemActionPerformed
+
+    private void populationItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_populationItemActionPerformed
+        PopulationSetting ps = new PopulationSetting(this, true, pg);
+        ps.setVisible(true);
+        if(!(ps.getMutationRate() == -1 || ps.getPopCount() == -1)) {
+            pg.setMutationRate(ps.getMutationRate());
+            pg.setPopCount(ps.getPopCount());
+            pg.setPopulationTimerDelay(ps.getTimerDelay());
+        }
+    }//GEN-LAST:event_populationItemActionPerformed
+
+    private void simulationItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_simulationItemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_simulationItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -310,13 +387,22 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton changeButton;
     private javax.swing.JButton createBarrierButton;
     private javax.swing.JButton deleteButton;
-    private javax.swing.JMenu editMenu;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JMenuItem loadBrainItem;
     private javax.swing.JMenuItem loadItem;
+    private javax.swing.JMenuItem loadPopulationItem;
+    private javax.swing.JMenuItem networkItem;
+    private javax.swing.JButton nextgenButton;
+    private javax.swing.JMenuItem populationItem;
+    private javax.swing.JMenuItem saveBestBrainItem;
     private javax.swing.JMenuItem saveItem;
-    private javax.swing.JButton spawnPlayer;
+    private javax.swing.JMenuItem savePopulationItem;
+    private javax.swing.JMenu settingsMenu;
+    private javax.swing.JMenuItem simulationItem;
     private javax.swing.JButton startButton;
     // End of variables declaration//GEN-END:variables
 }

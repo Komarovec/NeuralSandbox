@@ -31,7 +31,7 @@ public class NeuralNetwork {
         
         neuronLayers = new ArrayList<>();
         
-        neuronLayers.add(new NeuronLayer(car.getSensors().size()));
+        neuronLayers.add(new NeuronLayer(car.getSensorsCount()));
         for(int i = 1; i <= brainData.size(); i++) {
             neuronLayers.add(new NeuronLayer(neuronLayers.get(i-1), brainData.get(i-1)));
         }
@@ -84,7 +84,7 @@ public class NeuralNetwork {
         Graphics2D g2d = (Graphics2D)gr;
         
         for(int i = 0; i < brainData.size()+1; i++) {
-            neuronLayers.get(i).paintNeurons(g2d, pg, i*30);
+            neuronLayers.get(i).paintNeurons(g2d, pg, i*30, neuronLayers.size()*30);
         }
         
         for(NeuronLayer nl : neuronLayers) {

@@ -20,6 +20,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import static java.lang.Character.toLowerCase;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -39,6 +40,11 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     private Finish finish;
     
     private Population population;
+    private ArrayList<Integer> brainTemplate;
+    private int mutationRate;
+    private int popCount;
+    private boolean carFeedbackSensor;
+    private int populationTimerDelay;
     
     private final Dimension screenSize;
     private double scaleIndexX; //Přepokládá že poměr stran je 16:9
@@ -69,10 +75,11 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         this.addMouseMotionListener(this);
         this.addMouseListener(this);
         
-        timer = new Timer(10,this);
+        timer = new Timer(0,this);
         timer.start();
         barriers = new ArrayList();
         barriersToDelete = new ArrayList();
+        brainTemplate = new ArrayList<>(Arrays.asList(3,2));
         
         spawn = new Spawn(this, new Point(50,50));
         finish = new Finish(this, new Point(this.getTrueValue(this.getWidth())-100, this.getTrueValue(this.getHeight())-100));
@@ -82,6 +89,11 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         stater = 0;
         
         population = null;
+        mutationRate = 5;
+        popCount = 200;
+        populationTimerDelay = 20000;
+        carFeedbackSensor = false;
+        
         controled = null;
     }
 
@@ -107,6 +119,48 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
 
     public void setFinish(Finish finish) {
         this.finish = finish;
+    }
+
+    public ArrayList<Integer> getBrainTemplate() {
+        return brainTemplate;
+    }
+
+    public void setBrainTemplate(ArrayList<Integer> brainTemplate) {
+        if(brainTemplate == null) return;
+        System.out.println("Brain template: "+brainTemplate.toString());
+        this.brainTemplate = brainTemplate;
+    }
+
+    public int getMutationRate() {
+        return mutationRate;
+    }
+
+    public void setMutationRate(int mutationRate) {
+        this.mutationRate = mutationRate;
+    }
+
+    public int getPopCount() {
+        return popCount;
+    }
+
+    public void setPopCount(int popCount) {
+        this.popCount = popCount;
+    }
+
+    public boolean isCarFeedbackSensor() {
+        return carFeedbackSensor;
+    }
+
+    public void setCarFeedbackSensor(boolean carFeedbackSensor) {
+        this.carFeedbackSensor = carFeedbackSensor;
+    }
+
+    public int getPopulationTimerDelay() {
+        return populationTimerDelay;
+    }
+
+    public void setPopulationTimerDelay(int populationTimerDelay) {
+        this.populationTimerDelay = populationTimerDelay;
     }
     //Funkce zajištující škálování
     public Dimension getScreenSize() {
@@ -226,7 +280,13 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     
     public void startEvolution() {
         controled = null;
-        population = new Population(this, 200);
+        population = new Population(this, popCount, mutationRate, brainTemplate, carFeedbackSensor, populationTimerDelay);
+    }
+    
+    public void nextgen() {
+        if(population != null) {
+            population.endTest();
+        }
     }
     
     public void spawnPlayer() {

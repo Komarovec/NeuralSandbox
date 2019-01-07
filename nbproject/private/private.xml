@@ -5,7 +5,7 @@
             <url>src/geneticGame/Playground.java</url>
             <bookmark id="1">
                 <name/>
-                <line>120</line>
+                <line>122</line>
                 <key/>
             </bookmark>
         </file>
@@ -21,6 +21,7 @@
             <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/Car.java</file>
             <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/neuralNetwork/NeuralNetwork.java</file>
             <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/GameObject.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/genetics/Population.java</file>
             <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/neuralNetwork/NeuronLayer.java</file>
             <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/Playground.java</file>
         </group>
