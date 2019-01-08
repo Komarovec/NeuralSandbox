@@ -35,15 +35,32 @@ public class MainFrame extends javax.swing.JFrame {
         this.add(pg);
         Dimension screenS = new Dimension(
             pg.getScaledValue(1100),
-            pg.getScaledValue(800)+100
+            pg.getScaledValue(800)+150
         );
         this.setPreferredSize(screenS);
         this.setSize(screenS);
         initComponents();
+        setVisibleStatus(false);
     }
 
     public Playground getPlayground() {
         return pg;
+    }
+    
+    public void setGenerationValue(int gen) {
+        generationCountLabel.setText("Generation: "+gen);
+    }
+    
+    public void setFitnessValue(double fitness) {
+        maxFitnessLabel.setText("Max Fitness: "+Math.round(fitness));
+    }
+        
+    public void setPopAliveValue(int alive) {
+        popAliveLabel.setText("Population alive: "+alive);
+    }
+    
+    public void setVisibleStatus(boolean visible) {
+        statusPanel.setVisible(visible);
     }
     
     /**
@@ -61,6 +78,10 @@ public class MainFrame extends javax.swing.JFrame {
         deleteButton = new javax.swing.JButton();
         startButton = new javax.swing.JButton();
         nextgenButton = new javax.swing.JButton();
+        statusPanel = new javax.swing.JPanel();
+        generationCountLabel = new javax.swing.JLabel();
+        popAliveLabel = new javax.swing.JLabel();
+        maxFitnessLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         saveItem = new javax.swing.JMenuItem();
@@ -82,7 +103,9 @@ public class MainFrame extends javax.swing.JFrame {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        createBarrierButton.setText("Barrier");
+        createBarrierButton.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
+        createBarrierButton.setText("Add Barrier");
+        createBarrierButton.setToolTipText("Create new barrier");
         createBarrierButton.setFocusable(false);
         createBarrierButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         createBarrierButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -93,7 +116,9 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(createBarrierButton);
 
-        changeButton.setText("Change");
+        changeButton.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
+        changeButton.setText("Change barrier");
+        changeButton.setToolTipText("Click and hold to any barrier to change it's position.");
         changeButton.setFocusable(false);
         changeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         changeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -104,7 +129,9 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(changeButton);
 
-        deleteButton.setText("Delete");
+        deleteButton.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
+        deleteButton.setText("Delete barrier");
+        deleteButton.setToolTipText("Click to any barrier to delete it");
         deleteButton.setFocusable(false);
         deleteButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         deleteButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -115,7 +142,9 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(deleteButton);
 
+        startButton.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
         startButton.setText("Start Evolution");
+        startButton.setToolTipText("Starts evolving neural network according to the settings");
         startButton.setFocusable(false);
         startButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         startButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -126,7 +155,9 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(startButton);
 
-        nextgenButton.setText("Nextgen");
+        nextgenButton.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
+        nextgenButton.setText("Skipgen");
+        nextgenButton.setToolTipText("Skips current generation");
         nextgenButton.setFocusable(false);
         nextgenButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         nextgenButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -137,8 +168,28 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(nextgenButton);
 
+        statusPanel.setPreferredSize(new java.awt.Dimension(1140, 50));
+        statusPanel.setLayout(new java.awt.GridLayout());
+
+        generationCountLabel.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
+        generationCountLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        generationCountLabel.setText("jLabel1");
+        generationCountLabel.setPreferredSize(new java.awt.Dimension(63, 50));
+        statusPanel.add(generationCountLabel);
+
+        popAliveLabel.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
+        popAliveLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        popAliveLabel.setText("jLabel1");
+        statusPanel.add(popAliveLabel);
+
+        maxFitnessLabel.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
+        maxFitnessLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        maxFitnessLabel.setText("jLabel1");
+        statusPanel.add(maxFitnessLabel);
+
         fileMenu.setText("File");
 
+        saveItem.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
         saveItem.setText("Save level...");
         saveItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -147,6 +198,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         fileMenu.add(saveItem);
 
+        loadItem.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
         loadItem.setText("Load level...");
         loadItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -156,16 +208,20 @@ public class MainFrame extends javax.swing.JFrame {
         fileMenu.add(loadItem);
         fileMenu.add(jSeparator1);
 
+        saveBestBrainItem.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
         saveBestBrainItem.setText("Save best brain...");
         fileMenu.add(saveBestBrainItem);
 
+        loadBrainItem.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
         loadBrainItem.setText("Load brain...");
         fileMenu.add(loadBrainItem);
         fileMenu.add(jSeparator2);
 
+        savePopulationItem.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
         savePopulationItem.setText("Save population...");
         fileMenu.add(savePopulationItem);
 
+        loadPopulationItem.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
         loadPopulationItem.setText("Load population...");
         fileMenu.add(loadPopulationItem);
 
@@ -173,6 +229,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         settingsMenu.setText("Settings");
 
+        networkItem.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
         networkItem.setText("Neural network");
         networkItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -181,6 +238,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         settingsMenu.add(networkItem);
 
+        populationItem.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
         populationItem.setText("Population");
         populationItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -189,6 +247,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         settingsMenu.add(populationItem);
 
+        simulationItem.setFont(new java.awt.Font("Trebuchet MS", 0, 11)); // NOI18N
         simulationItem.setText("Simulation");
         simulationItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -205,13 +264,15 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 1050, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(statusPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 889, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 839, Short.MAX_VALUE)
+                .addComponent(statusPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -388,6 +449,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton createBarrierButton;
     private javax.swing.JButton deleteButton;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JLabel generationCountLabel;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
@@ -395,8 +457,10 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem loadBrainItem;
     private javax.swing.JMenuItem loadItem;
     private javax.swing.JMenuItem loadPopulationItem;
+    private javax.swing.JLabel maxFitnessLabel;
     private javax.swing.JMenuItem networkItem;
     private javax.swing.JButton nextgenButton;
+    private javax.swing.JLabel popAliveLabel;
     private javax.swing.JMenuItem populationItem;
     private javax.swing.JMenuItem saveBestBrainItem;
     private javax.swing.JMenuItem saveItem;
@@ -404,5 +468,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu settingsMenu;
     private javax.swing.JMenuItem simulationItem;
     private javax.swing.JButton startButton;
+    private javax.swing.JPanel statusPanel;
     // End of variables declaration//GEN-END:variables
 }

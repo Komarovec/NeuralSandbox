@@ -209,9 +209,8 @@ public class CarAI extends Car {
     @Override
     public void paint(Graphics gr) {
         super.paint(gr);
-        Graphics2D g2d = (Graphics2D)gr;
-        
         if(!this.frozen) {
+            Graphics2D g2d = (Graphics2D)gr;
             for(Sensor s : sensors) {
                 s.paint(gr, showSensors);
             }

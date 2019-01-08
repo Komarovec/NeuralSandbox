@@ -97,6 +97,10 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         controled = null;
     }
 
+    public MainFrame getMf() {
+        return mf;
+    }
+
     public ArrayList<Barrier> getBarriers() {
         return barriers;
     }
@@ -280,6 +284,10 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     
     public void startEvolution() {
         controled = null;
+        mf.setVisibleStatus(true);
+        mf.setFitnessValue(0);
+        mf.setPopAliveValue(0);
+        mf.setGenerationValue(0);
         population = new Population(this, popCount, mutationRate, brainTemplate, carFeedbackSensor, populationTimerDelay);
     }
     

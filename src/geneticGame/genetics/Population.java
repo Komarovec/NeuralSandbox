@@ -10,7 +10,6 @@ import geneticGame.CarAI;
 import geneticGame.Playground;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -25,7 +24,6 @@ public final class Population {
     
     private ArrayList<Integer> brainTemplate;
     private ArrayList<CarAI> individuals;
-    private ArrayList<CarAI> frozen;
     private ArrayList<CarAI> carsToDelete;
     
     private boolean carFeedbackSensor;
@@ -37,6 +35,10 @@ public final class Population {
     
     private Color avgColor;
     private Color bestColor;
+    
+    private CarAI bestFit;
+    private int bestFitCurrentIndex;
+    
     
     private int stater; // 0 -- Waiting; 1 -- Testing; 2 -- Calculating/Mutating/Evolving  
     
@@ -51,7 +53,6 @@ public final class Population {
         timer = new Timer("test");
         
         individuals = new ArrayList<>();
-        frozen = new ArrayList<>();
         carsToDelete = new ArrayList<>();
         
         avgColor = Color.red;
@@ -76,20 +77,20 @@ public final class Population {
         return generation;
     }
 
-    public ArrayList<CarAI> getFrozen() {
-        return frozen;
-    }
-
-    public void setFrozen(ArrayList<CarAI> frozen) {
-        this.frozen = frozen;
-    }
-
     public int getMutationRate() {
         return mutationRate;
     }
 
     public void setMutationRate(int mutationRate) {
         this.mutationRate = mutationRate;
+    }
+
+    public CarAI getBestFit() {
+        return bestFit;
+    }
+
+    public int getBestFitCurrentIndex() {
+        return bestFitCurrentIndex;
     }
     //End of getters and setters
     
@@ -100,8 +101,12 @@ public final class Population {
     
     //Náhodná populace
     public void generateRandomPopulation() { 
-        for(int i = 0; i < this.popCount; i++)
+        for(int i = 0; i < this.popCount; i++) {
            newCar(new CarAI(brainTemplate, pg, pg.getSpawn().getSpawnpoint(), carFeedbackSensor));
+        }
+        //Inicializace bestFit
+        bestFit = individuals.get(0);
+        bestFitCurrentIndex = 0;
     }
     
     //Sort
@@ -152,20 +157,23 @@ public final class Population {
     public void crossover() {
         double fitnessSum = 0;
         Random rand = new Random();
-
+        
+        //Vypočita kolik z populace bude max vybrano
         ArrayList<CarAI> picked = new ArrayList<>();
         int pickCount = (int)Math.ceil(this.popCount/20);
        
-        for(CarAI car : frozen) {
+        //Suma populacniho fitnessu
+        for(CarAI car : individuals) {
             fitnessSum += car.getFitness();
         }
 
+        //Vybirani jedincu k pareni
         int i = 0;
         while(picked.size() < pickCount) {
-            if(i >= frozen.size()) {
+            if(i >= individuals.size()) {
                 i = 0;
             }
-            CarAI car = frozen.get(i);
+            CarAI car = individuals.get(i);
             
             double chance = car.getFitness()/fitnessSum;
             double randChance = rand.nextDouble()*100;
@@ -178,15 +186,20 @@ public final class Population {
             i++;
         }
         
+        //Sort podle fitnessu
         picked = bubbleSortByFitness(picked);
-        
+
         for(CarAI car : picked) {
+            if(car.getFitness() > bestFit.getFitness()) {
+                pg.getMf().setFitnessValue(bestFit.getFitness());
+                bestFit = car;
+            }
             System.out.println(car.getFitness());
         }
         
         individuals.clear();
 
-        //Náhodné páření (z 1/10 nejlepších) do populace
+        //Náhodné páření (z 1/20 nejlepších) do populace
         for(int j = 0; j < this.popCount; j++) {
             int randomPick = rand.nextInt(pickCount);
             CarAI parent1 = picked.get(randomPick);
@@ -201,8 +214,12 @@ public final class Population {
    
     //Spusti testování populace
     public void startTest() {
-        stater = 1;
-        timer = new Timer("test");
+        stater = 1;    
+        
+        pg.getMf().setGenerationValue(generation);
+        
+        timer.cancel();
+        timer = new Timer("TestTimer");
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -217,17 +234,10 @@ public final class Population {
         timer.cancel();
         
         System.out.println("-------------------------------");
-        System.out.println("Individuals: "+individuals.size()+" Frozen: "+frozen.size()+" Combined:"+(individuals.size()+frozen.size()));
+        System.out.println("Individuals: "+individuals.size());
         System.out.println("-------------------------------");
         
         stater = 2;
-        if(!individuals.isEmpty()) {
-            for(CarAI car : individuals) {
-                car.setFrozen(true);
-                frozen.add(car);
-            }
-        }
-        individuals.clear();
 
         //Refresh hodnot z UI
         this.popCount = pg.getPopCount();
@@ -238,64 +248,64 @@ public final class Population {
         crossover();
         generation++;
         
-        
         System.out.println(individuals.size());
         System.out.println("Generation: "+generation);
         System.out.println("-------------------------------");
-        
-
-        frozen.clear();
         
         startTest();
     }
     
     public void paint(Graphics gr) {
         //Iteruj pro všechny individualy
-        if(!frozen.isEmpty()) {
-            for(CarAI car : frozen) {
-                car.paint(gr);
-            }
-        }
         
-        if(!individuals.isEmpty() && stater == 1) {         
-            individuals.get(0).paintBrain(gr);
-            individuals.get(0).setFillColor(bestColor);
-            
+        if(stater == 1) {  
+            //Vykreslí mozek pouze od nejlepšího z generace 
+            int frozenCount = 0;
             for(CarAI car : individuals) {
                 car.paint(gr);
+                
+                if(car.isFrozen()) {
+                    frozenCount++;
+                    continue;
+                }
                 car.calculateFitness();
                 
+                //Najdi nejlepšiho jedince v generaci
+                if(car.getFitness() > individuals.get(bestFitCurrentIndex).getFitness() || individuals.get(bestFitCurrentIndex).isFrozen()) {
+                    individuals.get(bestFitCurrentIndex).setFillColor(individuals.get(bestFitCurrentIndex).isFrozen() ? Color.cyan : avgColor);
+                    bestFitCurrentIndex = individuals.indexOf(car);
+                }
+                
+                //Dojel co cíle
                 if(car.detectCollision(pg.getFinish().getArea())) {
                     car.setFrozen(true);
                     car.setFillColor(Color.PINK);
-                    frozen.add(car);
-                    carsToDelete.add(car);
-                    
                     car.setFitness(Math.pow(car.getFitness(),4));
-                    System.out.println("Solution found!");
                 }
                 
                 //Nabourání do bariery
-                for(Barrier br : pg.getBarriers()){
-                    //Kolize s autem              
+                for(Barrier br : pg.getBarriers()){       
                     if(car.detectCollision(br.getArea())) {
                         car.setFrozen(true);
                         car.setFillColor(Color.cyan);
-                        carsToDelete.add(car);
-                        frozen.add(car);
                         break;
                     }
                 }
             }
             
-            for(CarAI car : carsToDelete) {
-                individuals.remove(car);
-            }
-            carsToDelete.clear();
+            pg.getMf().setPopAliveValue(popCount-frozenCount);
             
-        }
-        else {
-            endTest();
+            if(individuals.get(bestFitCurrentIndex).isFrozen()) {
+                individuals.get(bestFitCurrentIndex).paintBrain(gr);
+            }
+            else {
+                individuals.get(bestFitCurrentIndex).paintBrain(gr);
+                individuals.get(bestFitCurrentIndex).setFillColor(bestColor);
+            }
+            
+            if(frozenCount == individuals.size()) {
+                endTest();
+            }
         }
     }
 }
