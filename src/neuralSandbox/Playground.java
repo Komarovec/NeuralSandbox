@@ -306,7 +306,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         }
         
         if(viewMod == 1) {
-            if(population == null) {
+            if(population == null || population.getIndividuals().size() == 0) {
                 this.setLocation(0,0);
             }
             else {
