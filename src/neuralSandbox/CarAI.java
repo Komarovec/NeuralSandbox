@@ -211,13 +211,15 @@ public class CarAI extends Car {
     public void paint(Graphics gr) {
         super.paint(gr);
         if(!this.frozen) {
-            Graphics2D g2d = (Graphics2D)gr;
             for(Sensor s : sensors) {
                 s.paint(gr, showSensors);
             }
-
+            
             brain.think(measureDistance());
-            //System.out.println("Dist: "+sLeft.getDistanceToBarrier());
+            
+            //DEBUG!!
+            if(playerControl)
+                System.out.println("Dist: "+sensors.get(0).getDistanceToBarrier());
         }
     }
     

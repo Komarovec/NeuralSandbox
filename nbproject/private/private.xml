@@ -5,20 +5,22 @@
             <url>src/geneticGame/Playground.java</url>
             <bookmark id="1">
                 <name/>
-                <line>196</line>
+                <line>209</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/MainFrame.java</file>
-            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/Playground.java</file>
-            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/CarAI.java</file>
-            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/Spawn.java</file>
-            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/Car.java</file>
-            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/genetics/Population.java</file>
-            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/GeneticAlgorithm/src/geneticGame/Finish.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/NeuralSandbox/src/neuralSandbox/neuralNetwork/NeuronLayer.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/NeuralSandbox/src/neuralSandbox/Car.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/NeuralSandbox/src/neuralSandbox/Dialogs/PopulationSetting.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/NeuralSandbox/src/neuralSandbox/MainFrame.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/NeuralSandbox/src/neuralSandbox/neuralNetwork/NeuralNetwork.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/NeuralSandbox/src/neuralSandbox/Dialogs/NeuralNetworkSetting.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/NeuralSandbox/src/neuralSandbox/genetics/Population.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/NeuralSandbox/src/neuralSandbox/Playground.java</file>
+            <file>file:/C:/Users/Denis%20Kurka/Documents/NetBeansProjects/NeuralSandbox/src/neuralSandbox/CarAI.java</file>
         </group>
     </open-files>
 </project-private>

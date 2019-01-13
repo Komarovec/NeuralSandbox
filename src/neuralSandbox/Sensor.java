@@ -132,7 +132,9 @@ public class Sensor {
             }
         }
         
-        minDistance = minDistance/this.length;
+        minDistance = 0.9*Math.log10(minDistance/this.length)+1;
+        
+        if(minDistance < 0) minDistance = 0;
         
         return minDistance;
     }

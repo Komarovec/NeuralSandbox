@@ -158,6 +158,7 @@ public class Car {
 
     public void setFrozen(boolean frozen) {
         this.frozen = frozen;
+        this.fillColor = Color.cyan;
     }
     // End of Getters and Setters
     

@@ -32,6 +32,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     private final MainFrame mf;
     
     private Timer timer;
+    private int frames;
     private ArrayList<Barrier> barriers;
     private ArrayList<Barrier> barriersToDelete;
     
@@ -56,6 +57,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     
     private int stater; //0 - Wait; 1 - Create Mode; 2 - Change angle mode; 3 - Delete Mode; 4 - Change positions; 5 - Change position spawn; 6 - Change position finish
     private int viewMod; //0 - Free look; 1 - Follow mod
+    private boolean learning; 
     
     private boolean isAlt;
     private Point pivot;
@@ -92,16 +94,22 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         newBar = new Point(-1,-1);
         
         stater = 0;
-        viewMod = 0;
         
         population = null;
+        controled = null;
+        isAlt = false;
+        frames = 0;
+        
+        //Default settings
         mutationRate = 5;
         popCount = 200;
-        populationTimerDelay = 20000;
+        populationTimerDelay = 15000;
         carFeedbackSensor = false;
-        isAlt = false;
+        viewMod = 0;
+        learning = true;
         
-        controled = null;
+        //Debug
+        //spawnPlayer();
     }
 
     //Getters and setters
@@ -193,6 +201,25 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     public void setViewMod(int viewMod) {
         this.viewMod = viewMod;
     }
+
+    public int getFrames() {
+        return frames;
+    }
+
+    public void setFrames(int frames) {
+        this.frames = frames;
+    }
+
+    public boolean isLearning() {
+        return learning;
+    }
+
+    public void setLearning(boolean learning) {
+        this.learning = learning;
+        if(population != null) {
+            population.setLearning(learning);
+        }
+    }
     //End of getters end setters
     
     //Funkce zajištující škálování
@@ -267,7 +294,11 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     
     @Override
     protected void paintComponent(Graphics gr) {
+        if(!learning) return;
         super.paintComponent(gr);
+        
+        //Počítá snímky
+        frames++;
         
         //Vykresli spawn
         spawn.paint(gr);
@@ -306,7 +337,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         }
         
         if(viewMod == 1) {
-            if(population == null || population.getIndividuals().size() == 0) {
+            if(population == null || population.getIndividuals().isEmpty()) {
                 this.setLocation(0,0);
             }
             else {
@@ -360,6 +391,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         population = null;
         controled = new CarAI(this, spawn.getSpawnpoint());
         controled.setPlayerControl(true);
+        controled.setShowSensors(true);
     }
     
     //Loop funkce

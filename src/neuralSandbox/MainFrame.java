@@ -37,7 +37,9 @@ public class MainFrame extends javax.swing.JFrame {
         pg = new Playground(this);
         initComponents();
         myInitComponents();
+        
         setVisibleStatus(false);
+        resumeLearningButton.setVisible(false);
     }
 
     private void myInitComponents() {
@@ -84,6 +86,8 @@ public class MainFrame extends javax.swing.JFrame {
         deleteButton = new javax.swing.JButton();
         startButton = new javax.swing.JButton();
         nextgenButton = new javax.swing.JButton();
+        pauseLearningButton = new javax.swing.JButton();
+        resumeLearningButton = new javax.swing.JButton();
         statusPanel = new javax.swing.JPanel();
         generationCountLabel = new javax.swing.JLabel();
         popAliveLabel = new javax.swing.JLabel();
@@ -99,7 +103,6 @@ public class MainFrame extends javax.swing.JFrame {
         settingsMenu = new javax.swing.JMenu();
         networkItem = new javax.swing.JMenuItem();
         populationItem = new javax.swing.JMenuItem();
-        simulationItem = new javax.swing.JMenuItem();
         viewMenu = new javax.swing.JMenu();
         resetViewItem = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
@@ -177,6 +180,28 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(nextgenButton);
+
+        pauseLearningButton.setText("Pause learning");
+        pauseLearningButton.setFocusable(false);
+        pauseLearningButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        pauseLearningButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        pauseLearningButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pauseLearningButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(pauseLearningButton);
+
+        resumeLearningButton.setText("Resume learning");
+        resumeLearningButton.setFocusable(false);
+        resumeLearningButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        resumeLearningButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        resumeLearningButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resumeLearningButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(resumeLearningButton);
 
         statusPanel.setPreferredSize(new java.awt.Dimension(1140, 50));
         statusPanel.setLayout(new java.awt.GridLayout(1, 0));
@@ -266,14 +291,6 @@ public class MainFrame extends javax.swing.JFrame {
         });
         settingsMenu.add(populationItem);
 
-        simulationItem.setText("Simulation");
-        simulationItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                simulationItemActionPerformed(evt);
-            }
-        });
-        settingsMenu.add(simulationItem);
-
         jMenuBar1.add(settingsMenu);
 
         viewMenu.setText("View");
@@ -302,7 +319,7 @@ public class MainFrame extends javax.swing.JFrame {
         viewModMenu.add(viewModFreeRadio);
 
         viewGroup.add(viewModLockRadio);
-        viewModLockRadio.setText("Follow best");
+        viewModLockRadio.setText("Follow the best");
         viewModLockRadio.setToolTipText("Follows the fittest individual");
         viewModLockRadio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -411,10 +428,6 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_populationItemActionPerformed
 
-    private void simulationItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_simulationItemActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_simulationItemActionPerformed
-
     private void savePopulationItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePopulationItemActionPerformed
         savePopulation();
     }//GEN-LAST:event_savePopulationItemActionPerformed
@@ -446,6 +459,18 @@ public class MainFrame extends javax.swing.JFrame {
     private void viewModLockRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewModLockRadioActionPerformed
         pg.setViewMod(1);
     }//GEN-LAST:event_viewModLockRadioActionPerformed
+
+    private void pauseLearningButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseLearningButtonActionPerformed
+        pg.setLearning(false);
+        pauseLearningButton.setVisible(false);
+        resumeLearningButton.setVisible(true);
+    }//GEN-LAST:event_pauseLearningButtonActionPerformed
+
+    private void resumeLearningButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resumeLearningButtonActionPerformed
+        pg.setLearning(true);
+        resumeLearningButton.setVisible(false);
+        pauseLearningButton.setVisible(true);
+    }//GEN-LAST:event_resumeLearningButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -630,11 +655,9 @@ public class MainFrame extends javax.swing.JFrame {
             
             //Spawn
             String spawnPointXML = xml.substring(xml.indexOf("<Spawnpoint>"),xml.indexOf("</Spawnpoint>")+("</Spawnpoint>".length()));
-            System.out.println("Spawn: "+spawnPointXML);
             
             //Finish
             String finishPointXML = xml.substring(xml.indexOf("<Finishpoint>"),xml.indexOf("</Finishpoint>")+("</Finishpoint>".length()));
-            System.out.println("Finish: "+finishPointXML);
             
             ArrayList<BarrierSkeleton> skelBars = (ArrayList<BarrierSkeleton>)xstream.fromXML(barriersXML);
             xstream.alias("Spawnpoint", Point.class);
@@ -679,14 +702,15 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem networkItem;
     private javax.swing.JMenuItem newBarrierItem;
     private javax.swing.JButton nextgenButton;
+    private javax.swing.JButton pauseLearningButton;
     private javax.swing.JPanel playgroundPanel;
     private javax.swing.JLabel popAliveLabel;
     private javax.swing.JMenuItem populationItem;
     private javax.swing.JMenuItem resetViewItem;
+    private javax.swing.JButton resumeLearningButton;
     private javax.swing.JMenuItem saveItem;
     private javax.swing.JMenuItem savePopulationItem;
     private javax.swing.JMenu settingsMenu;
-    private javax.swing.JMenuItem simulationItem;
     private javax.swing.JButton startButton;
     private javax.swing.JPanel statusPanel;
     private javax.swing.ButtonGroup viewGroup;

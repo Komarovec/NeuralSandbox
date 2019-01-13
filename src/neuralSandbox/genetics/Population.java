@@ -12,8 +12,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+
 
 /**
  *
@@ -30,19 +29,22 @@ public final class Population {
     private int popCount;
     private int generation;
     private int mutationRate;
+    
     private int timerDelay;
-    private Timer timer;
+    private int timerCheckDistanceDelay;
+    private boolean checkDistance;
     
     public final Color avgColor = Color.red;
     public final Color bestColor = Color.yellow;
     
     private CarAI bestFit;
-    private int bestFitCurrentIndex;
+    private int bestFitCurrentIndex; 
     
-    private boolean timerAction;
+    private int stater; //1 -- Testing; 2 -- Calculating/Mutating/Evolving 
+    private boolean learning;
     
-    
-    private int stater; //1 -- Testing; 2 -- Calculating/Mutating/Evolving  
+    private boolean solution;
+    private CarAI solutionCar;
     
     public Population(Playground pg, int popCount, int mutationRate, ArrayList<Integer> brainTemplate, boolean carFeedbackSensor, int timerDelay) {
         this.pg = pg;
@@ -50,16 +52,12 @@ public final class Population {
         this.brainTemplate = brainTemplate;
         this.carFeedbackSensor = carFeedbackSensor;
         this.timerDelay = timerDelay;
-        generation = 0;
-        
-        timer = new Timer("test");
-        
-        individuals = new ArrayList<>();
-        carsToDelete = new ArrayList<>();
-        
+        this.generation = 0;
         this.mutationRate = mutationRate;
         
-        timerAction = false;
+        Init();
+        
+        individuals = new ArrayList<>();
         
         generateRandomPopulation();
         startTest();
@@ -72,15 +70,22 @@ public final class Population {
         this.generation = generation;
         this.mutationRate = mutationRate;
         this.timerDelay = timerDelay;
+        this.bestFit = individuals.get(0);
         
-        
-        timer = new Timer("test");
-        carsToDelete = new ArrayList<>();
-        bestFit = individuals.get(0);
+        Init();
         
         startTest();
     }
 
+    public void Init() {
+        carsToDelete = new ArrayList<>();
+        solution = false;
+        solutionCar = null;
+        
+        timerCheckDistanceDelay = 500;  
+        learning = true;
+    }
+    
     //Getters and setters
     public ArrayList<CarAI> getIndividuals() {
         return individuals;
@@ -116,6 +121,22 @@ public final class Population {
             allBrains.add(car.getBrain().getBrainData());
         }
         return allBrains;
+    }
+
+    public boolean isLearning() {
+        return learning;
+    }
+
+    public void setLearning(boolean learning) {
+        this.learning = learning;
+    }
+
+    public boolean isSolution() {
+        return solution;
+    }
+
+    public CarAI getSolutionCar() {
+        return solutionCar;
     }
     //End of getters and setters
     
@@ -207,9 +228,14 @@ public final class Population {
         }
         
         individuals.clear();
-
+        
+        //Dva nejlepší z generace neupravuj a přidej je rovnou
+        for(int i = 0; i < pickCount; i++) {
+            newCar(picked.get(i));
+        }
+        
         //Vytvoř novou generaci
-        for(int j = 0; j < this.popCount; j++) {
+        for(int j = 0; j < this.popCount-pickCount; j++) {
             int randomPick = rand.nextInt(pickCount);
             CarAI parent1 = picked.get(randomPick);
             
@@ -226,15 +252,8 @@ public final class Population {
         stater = 1;    
         
         pg.getMf().setGenerationValue(generation);
-        
-        timer.cancel();
-        timer = new Timer("TestTimer");
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                stater = 2;
-            }
-        }, timerDelay);
+        pg.setFrames(0);
+        checkDistance = true;
     }
     
     //Ukonci testovani populace a zhodnoti jejich výsledky
@@ -244,6 +263,7 @@ public final class Population {
         System.out.println("-------------------------------");
 
         //Refresh hodnot z UI
+        this.bestFitCurrentIndex = 0;
         this.popCount = pg.getPopCount();
         this.mutationRate = pg.getMutationRate();
         this.timerDelay = pg.getPopulationTimerDelay();
@@ -255,18 +275,28 @@ public final class Population {
         System.out.println(individuals.size());
         System.out.println("Generation: "+generation);
         System.out.println("-------------------------------");
+        System.out.println("Frames: "+pg.getFrames());
+        System.out.println("-------------------------------");
         
         startTest();
     }
     
     public void clearPopulation() {
-        timer.cancel();
         individuals.clear();
     }
     
     public void paint(Graphics gr) {
         //Iteruj pro všechny individualy
         if(stater == 1) {  
+            if(timerCheckDistanceDelay < pg.getFrames() && checkDistance) {
+                for(CarAI car : individuals) {
+                    if(car.getPos().distance(pg.getSpawn().getSpawnpoint()) < pg.getScaledValue(100)) {
+                        car.setFrozen(true);
+                    }
+                }
+                checkDistance = false;
+            }
+            
             //Vykreslí mozek pouze od nejlepšího z generace 
             int frozenCount = 0;
             for(CarAI car : individuals) {
@@ -289,6 +319,8 @@ public final class Population {
                     car.setFrozen(true);
                     car.setFillColor(Color.PINK);
                     car.setFitness(Math.pow(car.getFitness(),4));
+                    solution = true;
+                    solutionCar = car;
                 }
                 
                 //Nabourání do bariery
@@ -311,7 +343,8 @@ public final class Population {
                 individuals.get(bestFitCurrentIndex).setFillColor(bestColor);
             }
             
-            if(frozenCount == individuals.size()) {
+            //Ukonči testování
+            if(frozenCount == individuals.size() || timerDelay < pg.getFrames()) {
                 stater = 2;
             }
         }
