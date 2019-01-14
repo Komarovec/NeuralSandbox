@@ -118,6 +118,17 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator3">
+            </MenuItem>
+            <MenuItem class="javax.swing.JCheckBoxMenuItem" name="showSensorsCheckbox">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Draw sensors"/>
+                <Property name="toolTipText" type="java.lang.String" value="Sensors of each car will be drawn"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showSensorsCheckboxActionPerformed"/>
+              </Events>
+            </MenuItem>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="editMenu">
@@ -157,6 +168,9 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="title" type="java.lang.String" value="NeuralSandbox"/>
+    <Property name="iconImages" type="java.util.List" editor="org.netbeans.modules.form.ComponentChooserEditor">
+      <ComponentRef name="null"/>
+    </Property>
     <Property name="name" type="java.lang.String" value="NeuralSandbox" noResource="true"/>
   </Properties>
   <SyntheticProperties>
@@ -187,10 +201,10 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jToolBar1" min="-2" pref="29" max="-2" attributes="0"/>
+              <Component id="jToolBar1" min="-2" pref="71" max="-2" attributes="0"/>
               <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-              <Component id="playgroundPanel" pref="782" max="32767" attributes="0"/>
-              <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
+              <Component id="playgroundPanel" min="-2" pref="690" max="-2" attributes="0"/>
+              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               <Component id="statusPanel" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -207,10 +221,15 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="createBarrierButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Add Barrier"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/neuralSandbox/icons/Add barier.png"/>
+            </Property>
             <Property name="toolTipText" type="java.lang.String" value="Create new barrier"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+              <Insets value="null"/>
+            </Property>
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
@@ -219,8 +238,10 @@
         </Component>
         <Component class="javax.swing.JButton" name="changeButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Change barrier"/>
-            <Property name="toolTipText" type="java.lang.String" value="Click and hold to any barrier to change it&apos;s position."/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/neuralSandbox/icons/Change barrier.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Change position of barrier"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -231,8 +252,10 @@
         </Component>
         <Component class="javax.swing.JButton" name="deleteButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Delete barrier"/>
-            <Property name="toolTipText" type="java.lang.String" value="Click to any barrier to delete it"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/neuralSandbox/icons/Delete barrier.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Delete barrier"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -243,8 +266,10 @@
         </Component>
         <Component class="javax.swing.JButton" name="startButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="New population"/>
-            <Property name="toolTipText" type="java.lang.String" value="Starts evolving neural network according to the settings"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/neuralSandbox/icons/New population.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Creates new population"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -255,7 +280,9 @@
         </Component>
         <Component class="javax.swing.JButton" name="nextgenButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Skipgen"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/neuralSandbox/icons/Skipgen.png"/>
+            </Property>
             <Property name="toolTipText" type="java.lang.String" value="Skips current generation"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -267,7 +294,10 @@
         </Component>
         <Component class="javax.swing.JButton" name="pauseLearningButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Pause learning"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/neuralSandbox/icons/Pause learning.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Pauses simulation"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -278,7 +308,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="resumeLearningButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Resume learning"/>
+            <Property name="toolTipText" type="java.lang.String" value="Resumes simulation"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -348,7 +378,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="782" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="690" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>

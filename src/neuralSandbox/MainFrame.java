@@ -7,10 +7,12 @@ package neuralSandbox;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import java.awt.Color;
 import neuralSandbox.Dialogs.NeuralNetworkSetting;
 import neuralSandbox.Dialogs.PopulationSetting;
 import neuralSandbox.genetics.Population;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +21,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -29,6 +33,8 @@ import javax.swing.JOptionPane;
  */
 public class MainFrame extends javax.swing.JFrame {
     private final Playground pg;
+    private Color defaultButtonColor;
+    
     
     /**
      * Creates new form MainFrame
@@ -44,6 +50,17 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void myInitComponents() {
         playgroundPanel.add(pg);
+        
+        try {
+            Image i = ImageIO.read(getClass().getResource("icons/programIcon.png"));
+            setIconImage(i);
+        }
+        catch(Exception e) {}
+        
+        defaultButtonColor = createBarrierButton.getBackground();
+        createBarrierButton.setOpaque(true);
+        changeButton.setOpaque(true);
+        deleteButton.setOpaque(true);
     }
     
     public Playground getPlayground() {
@@ -68,6 +85,12 @@ public class MainFrame extends javax.swing.JFrame {
     
     public void setVisibleStatus(boolean visible) {
         statusPanel.setVisible(visible);
+    }
+    
+    public void resetButtonColors() {
+        createBarrierButton.setBackground(defaultButtonColor);
+        changeButton.setBackground(defaultButtonColor);
+        deleteButton.setBackground(defaultButtonColor);
     }
     
     /**
@@ -109,6 +132,8 @@ public class MainFrame extends javax.swing.JFrame {
         viewModMenu = new javax.swing.JMenu();
         viewModFreeRadio = new javax.swing.JRadioButtonMenuItem();
         viewModLockRadio = new javax.swing.JRadioButtonMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        showSensorsCheckbox = new javax.swing.JCheckBoxMenuItem();
         editMenu = new javax.swing.JMenu();
         newBarrierItem = new javax.swing.JMenuItem();
         changeBarrierItem = new javax.swing.JMenuItem();
@@ -116,15 +141,17 @@ public class MainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("NeuralSandbox");
+        setIconImages(null);
         setName("NeuralSandbox"); // NOI18N
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        createBarrierButton.setText("Add Barrier");
+        createBarrierButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neuralSandbox/icons/Add barier.png"))); // NOI18N
         createBarrierButton.setToolTipText("Create new barrier");
         createBarrierButton.setFocusable(false);
         createBarrierButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        createBarrierButton.setMargin(null);
         createBarrierButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         createBarrierButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -133,8 +160,8 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(createBarrierButton);
 
-        changeButton.setText("Change barrier");
-        changeButton.setToolTipText("Click and hold to any barrier to change it's position.");
+        changeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neuralSandbox/icons/Change barrier.png"))); // NOI18N
+        changeButton.setToolTipText("Change position of barrier");
         changeButton.setFocusable(false);
         changeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         changeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -145,8 +172,8 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(changeButton);
 
-        deleteButton.setText("Delete barrier");
-        deleteButton.setToolTipText("Click to any barrier to delete it");
+        deleteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neuralSandbox/icons/Delete barrier.png"))); // NOI18N
+        deleteButton.setToolTipText("Delete barrier");
         deleteButton.setFocusable(false);
         deleteButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         deleteButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -157,8 +184,8 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(deleteButton);
 
-        startButton.setText("New population");
-        startButton.setToolTipText("Starts evolving neural network according to the settings");
+        startButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neuralSandbox/icons/New population.png"))); // NOI18N
+        startButton.setToolTipText("Creates new population");
         startButton.setFocusable(false);
         startButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         startButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -169,7 +196,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(startButton);
 
-        nextgenButton.setText("Skipgen");
+        nextgenButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neuralSandbox/icons/Skipgen.png"))); // NOI18N
         nextgenButton.setToolTipText("Skips current generation");
         nextgenButton.setFocusable(false);
         nextgenButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -181,7 +208,8 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(nextgenButton);
 
-        pauseLearningButton.setText("Pause learning");
+        pauseLearningButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neuralSandbox/icons/Pause learning.png"))); // NOI18N
+        pauseLearningButton.setToolTipText("Pauses simulation");
         pauseLearningButton.setFocusable(false);
         pauseLearningButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         pauseLearningButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -192,7 +220,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(pauseLearningButton);
 
-        resumeLearningButton.setText("Resume learning");
+        resumeLearningButton.setToolTipText("Resumes simulation");
         resumeLearningButton.setFocusable(false);
         resumeLearningButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         resumeLearningButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -233,7 +261,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
         playgroundPanelLayout.setVerticalGroup(
             playgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 782, Short.MAX_VALUE)
+            .addGap(0, 690, Short.MAX_VALUE)
         );
 
         fileMenu.setText("File");
@@ -329,6 +357,16 @@ public class MainFrame extends javax.swing.JFrame {
         viewModMenu.add(viewModLockRadio);
 
         viewMenu.add(viewModMenu);
+        viewMenu.add(jSeparator3);
+
+        showSensorsCheckbox.setText("Draw sensors");
+        showSensorsCheckbox.setToolTipText("Sensors of each car will be drawn");
+        showSensorsCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showSensorsCheckboxActionPerformed(evt);
+            }
+        });
+        viewMenu.add(showSensorsCheckbox);
 
         jMenuBar1.add(viewMenu);
 
@@ -373,10 +411,10 @@ public class MainFrame extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(playgroundPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 782, Short.MAX_VALUE)
-                .addGap(0, 0, 0)
+                .addComponent(playgroundPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 690, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(statusPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -385,10 +423,12 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void createBarrierButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createBarrierButtonActionPerformed
         pg.createBarrier();
+        createBarrierButton.setBackground(Color.ORANGE);
     }//GEN-LAST:event_createBarrierButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         pg.deleteBarrier();
+        deleteButton.setBackground(Color.ORANGE);
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void saveItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveItemActionPerformed
@@ -405,6 +445,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void changeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeButtonActionPerformed
         pg.changeBarrier();
+        changeButton.setBackground(Color.ORANGE);
     }//GEN-LAST:event_changeButtonActionPerformed
 
     private void nextgenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextgenButtonActionPerformed
@@ -471,6 +512,10 @@ public class MainFrame extends javax.swing.JFrame {
         resumeLearningButton.setVisible(false);
         pauseLearningButton.setVisible(true);
     }//GEN-LAST:event_resumeLearningButtonActionPerformed
+
+    private void showSensorsCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showSensorsCheckboxActionPerformed
+        pg.setShowSensors(showSensorsCheckbox.isSelected());
+    }//GEN-LAST:event_showSensorsCheckboxActionPerformed
 
     /**
      * @param args the command line arguments
@@ -695,6 +740,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JMenuItem loadItem;
     private javax.swing.JMenuItem loadPopulationItem;
@@ -711,6 +757,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem saveItem;
     private javax.swing.JMenuItem savePopulationItem;
     private javax.swing.JMenu settingsMenu;
+    private javax.swing.JCheckBoxMenuItem showSensorsCheckbox;
     private javax.swing.JButton startButton;
     private javax.swing.JPanel statusPanel;
     private javax.swing.ButtonGroup viewGroup;

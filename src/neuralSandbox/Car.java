@@ -298,7 +298,7 @@ public class Car {
         g2d.setColor(cirColor);
         g2d.draw(area);
         
-        if(!frozen) {
+        if(!frozen && pg.isLearning()) {
             this.move();
             this.rotateManual();
         }

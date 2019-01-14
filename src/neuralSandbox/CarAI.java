@@ -215,7 +215,8 @@ public class CarAI extends Car {
                 s.paint(gr, showSensors);
             }
             
-            brain.think(measureDistance());
+            if(pg.isLearning())
+                brain.think(measureDistance());
             
             //DEBUG!!
             if(playerControl)

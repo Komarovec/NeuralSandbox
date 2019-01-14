@@ -109,7 +109,7 @@ public class Sensor {
         return (this.area.intersects(colArea.getBounds2D()) && colArea.intersects(this.area.getBounds2D()));
     }
     
-    public double distanceFromNearestBarrier(Graphics2D g2d) {
+    public double distanceFromNearestBarrier(Graphics2D g2d, boolean showSensor) {
         double minDistance = this.length;
         
         for(Barrier b : pg.getBarriers()) {
@@ -124,7 +124,9 @@ public class Sensor {
                 Box2D barPrecise = new Box2D(intersectRect);
                 
                 double distance = barPrecise.asRectangle().distance(new Point2D(car.getPos().x, car.getPos().y));
-                //barPrecise.fill(g2d);
+                
+                if(showSensor)
+                    barPrecise.fill(g2d);
                 
                 if(distance < minDistance) {
                     minDistance = distance;
@@ -149,7 +151,7 @@ public class Sensor {
         AffineTransform s1 = AffineTransform.getRotateInstance(car.getAngle()+angleOffset, car.getPos().x, car.getPos().y);
         area = new Area(s1.createTransformedShape(new Rectangle2D.Double(pos.x, pos.y - width/2, length, width)));
         
-        distanceToBarrier = distanceFromNearestBarrier(g2d);
+        distanceToBarrier = distanceFromNearestBarrier(g2d, showSensor);
         
         if(showSensor) {
           g2d.setColor(fillColor);

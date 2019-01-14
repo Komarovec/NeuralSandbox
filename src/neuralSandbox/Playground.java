@@ -58,6 +58,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     private int stater; //0 - Wait; 1 - Create Mode; 2 - Change angle mode; 3 - Delete Mode; 4 - Change positions; 5 - Change position spawn; 6 - Change position finish
     private int viewMod; //0 - Free look; 1 - Follow mod
     private boolean learning; 
+    private boolean showSensors;
     
     private boolean isAlt;
     private Point pivot;
@@ -107,6 +108,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         carFeedbackSensor = false;
         viewMod = 0;
         learning = true;
+        showSensors = false;
         
         //Debug
         //spawnPlayer();
@@ -220,6 +222,19 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
             population.setLearning(learning);
         }
     }
+
+    public boolean isShowSensors() {
+        return showSensors;
+    }
+
+    public void setShowSensors(boolean showSensors) {
+        this.showSensors = showSensors;
+        if(population != null) {
+            for(CarAI car : population.getIndividuals()) {
+                car.setShowSensors(showSensors);
+            }
+        }
+    }
     //End of getters end setters
     
     //Funkce zajištující škálování
@@ -248,6 +263,12 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     }
     //Konec funkci zajištující škálování
 
+    
+    //Resetuje GUI mód (Tlačítka)
+    public void resetStater() {
+        stater = 0;
+        mf.resetButtonColors();
+    }
     
     //Smaž barieru pokud je na pointu
     public boolean deleteBarrierFromPoint(Point a) {
@@ -294,11 +315,11 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
     
     @Override
     protected void paintComponent(Graphics gr) {
-        if(!learning) return;
         super.paintComponent(gr);
         
         //Počítá snímky
-        frames++;
+        if(learning)
+            frames++;
         
         //Vykresli spawn
         spawn.paint(gr);
@@ -521,7 +542,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
 
             //Reset
             newBar = new Point(-1,-1);
-            stater = 0;
+            resetStater();
         }
         
         //Mazaní bariery
@@ -554,22 +575,22 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
                 break;
             case 3:
                 //Reset Delete
-                stater = 0;
+                resetStater();
                 break;
             case 4:
                 //Reset Pozice
                 barriers.add(tempBarrier);
-                stater = 0;
+                resetStater();
                 tempBarrier = null;
                 break;
             case 5:
                 //Reset Spawn
-                stater = 0;
+                resetStater();
                 tempBarrier = null;
                 break;
             case 6:
                 //Reset Finish
-                stater = 0;
+                resetStater();
                 tempBarrier = null;
                 break;
             default:
