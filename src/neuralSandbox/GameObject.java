@@ -46,6 +46,12 @@ public abstract class GameObject {
         this(pg, pos, Color.GRAY, Color.BLACK, 0);
     }   
         
+    public GameObject(GameObject gm) {
+        this.pg = gm.getPg();
+        this.pos = gm.getPos();
+        this.angle = gm.getAngle();
+        this.area = gm.getArea();
+    }
     
     //Getters and Setters
     public Playground getPg() {
@@ -57,11 +63,11 @@ public abstract class GameObject {
     }
     
     public Point getPos() {
-        return pos;
+        return new Point(pg.getTrueValue(pos.x), pg.getTrueValue(pos.y));
     }
 
     public final void setPos(Point pos) {
-        this.pos = pos;
+        this.pos = new Point(pg.getScaledValue(pos.x), pg.getScaledValue(pos.y));
     }
 
     public Color getFillColor() {

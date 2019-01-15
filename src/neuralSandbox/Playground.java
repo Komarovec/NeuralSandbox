@@ -318,8 +318,10 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         super.paintComponent(gr);
         
         //Počítá snímky
-        if(learning)
+        if(learning) {
             frames++;
+            mf.setFrameCountValue(frames);
+        }
         
         //Vykresli spawn
         spawn.paint(gr);
@@ -369,7 +371,7 @@ public class Playground extends JPanel implements ActionListener, KeyListener, M
         
         //Vykresli hrače <><>WIP<><> DEBUG ONLY
         if(controled != null) {
-            controled.paint(gr);
+            controled.paint(gr, true);
             controled.paintBrain(gr);
         }
     }

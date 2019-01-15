@@ -141,7 +141,7 @@ public class Sensor {
         return minDistance;
     }
     
-    void paint(Graphics gr, boolean showSensor) {
+    public void paint(Graphics gr, boolean showSensor) {
         Graphics2D g2d = (Graphics2D) gr;
         
         int x = (int)Math.round(car.getPos().x + offset);

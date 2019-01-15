@@ -146,7 +146,7 @@ public class PopulationSetting extends javax.swing.JDialog {
         });
 
         jLabel3.setFont(new java.awt.Font("Trebuchet MS", 0, 14)); // NOI18N
-        jLabel3.setText("Timer delay (1000 frames)");
+        jLabel3.setText("Kill switch (1000 frames)");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -261,8 +261,8 @@ public class PopulationSetting extends javax.swing.JDialog {
         if((Integer)timerDelaySpinner.getValue() < 5) {
             timerDelaySpinner.setValue(5);
         }
-        else if((Integer)timerDelaySpinner.getValue() > 120) {
-            timerDelaySpinner.setValue(120);
+        else if((Integer)timerDelaySpinner.getValue() > 600) {
+            timerDelaySpinner.setValue(600);
         }
         timerDelay = (Integer)timerDelaySpinner.getValue()*1000;
     }//GEN-LAST:event_timerDelaySpinnerStateChanged

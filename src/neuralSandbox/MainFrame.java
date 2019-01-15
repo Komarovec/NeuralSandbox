@@ -83,6 +83,10 @@ public class MainFrame extends javax.swing.JFrame {
         popAliveLabel.setText("Population alive: "+alive);
     }
     
+    public void setFrameCountValue(int frames) {
+        frameCountLabel.setText("Frames: "+frames);
+    }
+    
     public void setVisibleStatus(boolean visible) {
         statusPanel.setVisible(visible);
     }
@@ -115,6 +119,7 @@ public class MainFrame extends javax.swing.JFrame {
         generationCountLabel = new javax.swing.JLabel();
         popAliveLabel = new javax.swing.JLabel();
         maxFitnessLabel = new javax.swing.JLabel();
+        frameCountLabel = new javax.swing.JLabel();
         playgroundPanel = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
@@ -220,6 +225,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(pauseLearningButton);
 
+        resumeLearningButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neuralSandbox/icons/Play learning.png"))); // NOI18N
         resumeLearningButton.setToolTipText("Resumes simulation");
         resumeLearningButton.setFocusable(false);
         resumeLearningButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -249,6 +255,11 @@ public class MainFrame extends javax.swing.JFrame {
         maxFitnessLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         maxFitnessLabel.setText("Max Fitness");
         statusPanel.add(maxFitnessLabel);
+
+        frameCountLabel.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
+        frameCountLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        frameCountLabel.setText("Frames");
+        statusPanel.add(frameCountLabel);
 
         playgroundPanel.setPreferredSize(new Dimension(pg.getScaledValue(1200), pg.getScaledValue(800))
         );
@@ -413,9 +424,10 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(playgroundPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 690, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(statusPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(playgroundPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 690, Short.MAX_VALUE)
+                .addGap(0, 0, 0)
+                .addComponent(statusPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0))
         );
 
         pack();
@@ -736,6 +748,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton deleteButton;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JLabel frameCountLabel;
     private javax.swing.JLabel generationCountLabel;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPopupMenu.Separator jSeparator1;

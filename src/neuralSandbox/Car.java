@@ -286,17 +286,19 @@ public class Car {
         this.setPos(newPos);
     }
     
-    public void paint(Graphics gr) {
+    public void paint(Graphics gr, boolean noPaint) {
         Graphics2D g2d = (Graphics2D) gr;
 
         //Car
         AffineTransform at = AffineTransform.getRotateInstance(this.angle, pos.x, pos.y);
         area = new Area(at.createTransformedShape(new Rectangle2D.Double(pos.x - length/2, pos.y - width/2, length, width)));
         
-        g2d.setColor(fillColor);
-        g2d.fill(area);
-        g2d.setColor(cirColor);
-        g2d.draw(area);
+        if(!noPaint) {
+            g2d.setColor(fillColor);
+            g2d.fill(area);
+            g2d.setColor(cirColor);
+            g2d.draw(area);
+        }
         
         if(!frozen && pg.isLearning()) {
             this.move();

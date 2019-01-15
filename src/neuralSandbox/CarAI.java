@@ -30,7 +30,7 @@ public class CarAI extends Car {
     private boolean playerControl;
     private boolean feedbackSensor;
     
-    public CarAI(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor, int angle, boolean feedbackSensor, ArrayList<ArrayList<ArrayList<Double>>> brainData, ArrayList<Integer> brainTemplate) {
+    public CarAI(Playground pg, Point pos, int length, int width, Color fillColor, Color cirColor, int angle, boolean feedbackSensor, boolean showSensors, ArrayList<ArrayList<ArrayList<Double>>> brainData, ArrayList<Integer> brainTemplate) {
         super(pg, pos, length, width, fillColor, cirColor, angle);
         
         sensors = new ArrayList<>();
@@ -38,7 +38,7 @@ public class CarAI extends Car {
         sensors.add(new Sensor(this, sLenght, 1, 5, Color.CYAN, Color.BLACK, -Math.PI/4));
         sensors.add(new Sensor(this, sLenght, 1, 5, Color.CYAN, Color.BLACK, Math.PI/4));
         sensors.add(new Sensor(this, sLenght, 1, 5, Color.CYAN, Color.BLACK, 0));
-        showSensors = false;
+        this.showSensors = showSensors;
         
         this.feedbackSensor = feedbackSensor;
         
@@ -53,31 +53,31 @@ public class CarAI extends Car {
     }
     
     public CarAI(Playground pg, Point pos) {
-        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, false, null, new ArrayList<>(Arrays.asList(3,2)));
+        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, false, false, null, new ArrayList<>(Arrays.asList(3,2)));
     }
     
-    public CarAI(ArrayList<Integer> brainTemplate, Playground pg, Point pos, boolean feedback) {
-        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, feedback, null, brainTemplate);
+    public CarAI(ArrayList<Integer> brainTemplate, Playground pg, Point pos, boolean feedback, boolean showSensors) {
+        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, feedback, showSensors, null, brainTemplate);
     }
     
     public CarAI(Playground pg) {
-        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, false, null, new ArrayList<>(Arrays.asList(3,2)));
+        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, false, false, null, new ArrayList<>(Arrays.asList(3,2)));
     }
     
     public CarAI(Playground pg, Point pos, ArrayList<ArrayList<ArrayList<Double>>> brainData, boolean feedback) {
-        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, feedback, brainData, new ArrayList<>(Arrays.asList(3,2)));
+        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, feedback, false, brainData, new ArrayList<>(Arrays.asList(3,2)));
     }
     
     public CarAI(Playground pg, ArrayList<ArrayList<ArrayList<Double>>> brainData, boolean feedback) {
-        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, feedback, brainData, new ArrayList<>(Arrays.asList(3,2)));
+        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, feedback, false, brainData, new ArrayList<>(Arrays.asList(3,2)));
     }
     
-    public CarAI(Playground pg, Point pos, ArrayList<ArrayList<ArrayList<Double>>> brainData, ArrayList<Integer> brainTemplate, boolean feedback) {
-        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, feedback, brainData, brainTemplate);
+    public CarAI(Playground pg, Point pos, ArrayList<ArrayList<ArrayList<Double>>> brainData, ArrayList<Integer> brainTemplate, boolean feedback, boolean showSensors) {
+        this(pg, pos, 10, 4, Color.RED, Color.BLACK, 0, feedback, showSensors, brainData, brainTemplate);
     }
     
     public CarAI(Playground pg, ArrayList<ArrayList<ArrayList<Double>>> brainData, ArrayList<Integer> brainTemplate, boolean feedback) {
-        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, feedback, brainData, brainTemplate);
+        this(pg, new Point(pg.getWidth()/2,pg.getHeight()/2), 10, 4, Color.RED, Color.BLACK, 0, feedback, false, brainData, brainTemplate);
     }
     
     //Getters and Setters
@@ -208,11 +208,11 @@ public class CarAI extends Car {
     }
     
     @Override
-    public void paint(Graphics gr) {
-        super.paint(gr);
+    public void paint(Graphics gr, boolean noPaint) {
+        super.paint(gr, noPaint);
         if(!this.frozen) {
             for(Sensor s : sensors) {
-                s.paint(gr, showSensors);
+                s.paint(gr, (noPaint) ? false : showSensors);
             }
             
             if(pg.isLearning())

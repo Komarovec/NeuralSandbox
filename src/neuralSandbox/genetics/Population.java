@@ -33,6 +33,7 @@ public final class Population {
     private int timerDelay;
     private int timerCheckDistanceDelay;
     private boolean checkDistance;
+    private boolean showSensors;
     
     public final Color avgColor = Color.red;
     public final Color bestColor = Color.yellow;
@@ -45,6 +46,8 @@ public final class Population {
     
     private boolean solution;
     private CarAI solutionCar;
+    
+    private boolean noPaint;
     
     public Population(Playground pg, int popCount, int mutationRate, ArrayList<Integer> brainTemplate, boolean carFeedbackSensor, int timerDelay) {
         this.pg = pg;
@@ -78,9 +81,11 @@ public final class Population {
     }
 
     public void Init() {
+        noPaint = false;
         carsToDelete = new ArrayList<>();
         solution = false;
         solutionCar = null;
+        showSensors = pg.isShowSensors();
         
         timerCheckDistanceDelay = 500;  
         learning = true;
@@ -148,7 +153,7 @@ public final class Population {
     //Náhodná populace
     public void generateRandomPopulation() { 
         for(int i = 0; i < this.popCount; i++) {
-           newCar(new CarAI(brainTemplate, pg, pg.getSpawn().getSpawnpoint(), carFeedbackSensor));
+           newCar(new CarAI(brainTemplate, pg, pg.getSpawn().getSpawnpoint(), carFeedbackSensor, showSensors));
         }
         //Inicializace bestFit
         bestFit = individuals.get(0);
@@ -242,7 +247,7 @@ public final class Population {
             randomPick = rand.nextInt(pickCount);
             CarAI parent2 = picked.get(randomPick);
             
-            CarAI temp = new CarAI(pg, pg.getSpawn().getSpawnpoint(), mergeBrains(parent1.getBrain().getBrainData(), parent2.getBrain().getBrainData()), brainTemplate, carFeedbackSensor);
+            CarAI temp = new CarAI(pg, pg.getSpawn().getSpawnpoint(), mergeBrains(parent1.getBrain().getBrainData(), parent2.getBrain().getBrainData()), brainTemplate, carFeedbackSensor, showSensors);
             newCar(temp);
         }
     }
@@ -300,7 +305,7 @@ public final class Population {
             //Vykreslí mozek pouze od nejlepšího z generace 
             int frozenCount = 0;
             for(CarAI car : individuals) {
-                car.paint(gr);
+                car.paint(gr, noPaint);
                 
                 if(car.isFrozen()) {
                     frozenCount++;
