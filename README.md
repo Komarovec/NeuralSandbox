@@ -50,12 +50,13 @@ Population size is main source of variation in the generation and can heavilly e
 Mutation is another really important factor and it is required for further progression.  
 Kill switch time *kills* whole generation when the certain amount of frames were drawn. --> Prevents from being stuck.    
 **These values will take effect on the current generation and are there for you to play with :)**  
-<hr>
+<hr>  
+
 ## 4K Compatible
 Application is fully scalable to 4K and other high resolutions!  
 *Except for java.awt stuff* 
-
 <hr>
+  
 ## Testing
 Recommended testing:  
 1.  In File -> Load level, select level in ./level/snake.xml  
