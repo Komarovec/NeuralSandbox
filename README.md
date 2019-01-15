@@ -5,7 +5,7 @@
 3. Run NeuralSandbox.jar in the folder
 
 ## Controls
-**Moving around playground:**
+**Moving around playground:**\n
 ALT + Mouse drag --> Move around playground
 
 **Change view**
