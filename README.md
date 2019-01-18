@@ -1,5 +1,5 @@
 # NeuralSandbox
-Create your own racetrack and watch racecars with AI trying to complete your challange!  
+Create your own racetrack and watch racecars with AI trying to complete your challenge!  
 <hr>
 
 ## Tutos
