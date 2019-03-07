@@ -3,6 +3,8 @@ Create your own racetrack and watch racecars with AI trying to complete your cha
 <hr>
 
 ## Tutos
+0. Download compiled version here: 
+https://github.com/Komarovec/NeuralSandbox/releases
 1. Extract downloaded .rar file.
 2. Make sure to have Java Runtime installed.
 3. Run NeuralSandbox.jar in the folder
