@@ -2,7 +2,7 @@
 Create your own racetrack and watch racecars with AI trying to complete your challenge!  
 <hr>
 
-## Tutos
+## Download/Run
 0. Download compiled version here: 
 https://github.com/Komarovec/NeuralSandbox/releases
 1. Extract downloaded .rar file.
